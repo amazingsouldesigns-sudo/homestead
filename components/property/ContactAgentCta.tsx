@@ -39,7 +39,7 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
   const [schedulePhone, setSchedulePhone] = useState('');
   const [scheduleSubmitting, setScheduleSubmitting] = useState(false);
   // TODO: set back to false after previewing — shows thank-you slide-out on load
-  const [thankYouOpen, setThankYouOpen] = useState(true);
+  const [thankYouOpen, setThankYouOpen] = useState(false);
   const closeThankYou = useCallback(() => setThankYouOpen(false), []);
   const emailRaw = process.env.NEXT_PUBLIC_CONTACT_AGENT_EMAIL ?? '';
   const email = normalizeContactEmail(emailRaw);
