@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { timeAgo } from '@/lib/utils';
-import { Loader2, Shield, User, Trash2 } from 'lucide-react';
+import { Loader2, Shield, Trash2 } from 'lucide-react';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import toast from 'react-hot-toast';
 
 export default function AdminUsersPage() {
@@ -62,9 +63,7 @@ export default function AdminUsersPage() {
               <tr key={u.id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
                 <td className="px-5 py-3.5">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-xs">
-                      {u.full_name?.[0]?.toUpperCase() || <User className="w-3.5 h-3.5" />}
-                    </div>
+                    <UserAvatar avatarUrl={u.avatar_url} size="sm" />
                     <div>
                       <p className="font-medium text-sm text-slate-900">{u.full_name || 'No name'}</p>
                       <p className="text-xs text-slate-500">{u.email}</p>

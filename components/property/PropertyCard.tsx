@@ -6,7 +6,7 @@ import { Heart, Bed, Bath, Maximize, MapPin, Sparkles } from 'lucide-react';
 import { formatPrice, formatNumber, getPropertyTypeLabel, getStatusLabel, cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase-browser';
 import { useAuthStore } from '@/lib/store';
-import { useState } from 'react';
+import { useState, type SVGProps } from 'react';
 import toast from 'react-hot-toast';
 import type { Property } from '@/types';
 
@@ -57,7 +57,6 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
   return (
     <Link href={`/properties/${property.slug}`} className="group block">
       <article className="card overflow-hidden">
-        {/* Image */}
         <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
           {primaryImage ? (
             <Image
@@ -73,14 +72,13 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
             </div>
           )}
 
-          {/* Overlays */}
           <div className="absolute top-3 left-3 flex gap-2">
-            <span className={cn(
-              'badge shadow-sm',
-              property.property_status === 'for_sale'
-                ? 'bg-brand-600 text-white'
-                : 'bg-blue-600 text-white'
-            )}>
+            <span
+              className={cn(
+                'badge shadow-sm',
+                property.property_status === 'for_sale' ? 'bg-brand-600 text-white' : 'bg-blue-600 text-white'
+              )}
+            >
               {getStatusLabel(property.property_status)}
             </span>
             {property.is_featured && (
@@ -92,6 +90,7 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
           </div>
 
           <button
+            type="button"
             onClick={handleSave}
             disabled={saving}
             className={cn(
@@ -104,7 +103,6 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
             <Heart className={cn('w-4 h-4', isSaved && 'fill-current')} />
           </button>
 
-          {/* Price overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
             <span className="text-2xl font-bold text-white font-display">
               {formatPrice(property.price)}
@@ -115,14 +113,15 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
           </div>
         </div>
 
-        {/* Details */}
         <div className="p-4">
           <h3 className="font-semibold text-slate-900 text-[15px] mb-1.5 line-clamp-1 group-hover:text-brand-600 transition-colors">
             {property.title}
           </h3>
           <div className="flex items-center gap-1.5 text-slate-500 text-sm mb-3">
             <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-            <span className="truncate">{property.address}, {property.city}</span>
+            <span className="truncate">
+              {property.address}, {property.city}
+            </span>
           </div>
           <div className="flex items-center gap-4 text-sm text-slate-600">
             <div className="flex items-center gap-1.5">
@@ -139,9 +138,7 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
             </div>
           </div>
           <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span className="badge bg-slate-100 text-slate-600">
-              {getPropertyTypeLabel(property.property_type)}
-            </span>
+            <span className="badge bg-slate-100 text-slate-600">{getPropertyTypeLabel(property.property_type)}</span>
           </div>
         </div>
       </article>
@@ -149,7 +146,7 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
   );
 }
 
-function Home(props: any) {
+function Home(props: SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
       <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />

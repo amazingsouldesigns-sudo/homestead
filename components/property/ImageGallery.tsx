@@ -11,11 +11,23 @@ interface ImageGalleryProps {
   title: string;
 }
 
+function dedupeImagesByUrl(images: PropertyImage[]): PropertyImage[] {
+  const seen = new Set<string>();
+  return images.filter((img) => {
+    const u = img.url?.trim();
+    if (!u) return false;
+    if (seen.has(u)) return false;
+    seen.add(u);
+    return true;
+  });
+}
+
 export default function ImageGallery({ images, title }: ImageGalleryProps) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const uniqueImages = dedupeImagesByUrl(images);
 
-  if (!images.length) {
+  if (!uniqueImages.length) {
     return (
       <div className="gallery-grid">
         <div className="bg-slate-100 flex items-center justify-center col-span-full aspect-[2/1]">
@@ -28,10 +40,10 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
     );
   }
 
-  const displayImages = images.slice(0, 5);
+  const displayImages = uniqueImages.slice(0, 5);
 
-  const next = () => setCurrentIndex((i) => (i + 1) % images.length);
-  const prev = () => setCurrentIndex((i) => (i - 1 + images.length) % images.length);
+  const next = () => setCurrentIndex((i) => (i + 1) % uniqueImages.length);
+  const prev = () => setCurrentIndex((i) => (i - 1 + uniqueImages.length) % uniqueImages.length);
 
   return (
     <>
@@ -47,9 +59,9 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
               sizes={i === 0 ? '60vw' : '30vw'}
               priority={i === 0}
             />
-            {i === displayImages.length - 1 && images.length > 5 && (
+            {i === displayImages.length - 1 && uniqueImages.length > 5 && (
               <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <span className="text-white font-semibold text-lg">+{images.length - 5} more</span>
+                <span className="text-white font-semibold text-lg">+{uniqueImages.length - 5} more</span>
               </div>
             )}
           </div>
@@ -62,7 +74,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
         className="mt-3 btn-secondary text-sm"
       >
         <Camera className="w-4 h-4" />
-        View All {images.length} Photos
+        View All {uniqueImages.length} Photos
       </button>
 
       {/* Lightbox */}
@@ -84,7 +96,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
 
           <div className="relative w-full max-w-5xl aspect-[16/10] mx-16">
             <Image
-              src={images[currentIndex].url}
+              src={uniqueImages[currentIndex].url}
               alt={`${title} - Photo ${currentIndex + 1}`}
               fill
               className="object-contain"
@@ -101,12 +113,12 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
 
           {/* Counter */}
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/10 rounded-full px-4 py-2 text-white text-sm font-medium">
-            {currentIndex + 1} / {images.length}
+            {currentIndex + 1} / {uniqueImages.length}
           </div>
 
           {/* Thumbnails */}
           <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 max-w-xl overflow-x-auto pb-2">
-            {images.map((img, i) => (
+            {uniqueImages.map((img, i) => (
               <button
                 key={img.id}
                 onClick={() => setCurrentIndex(i)}

@@ -3,9 +3,13 @@ import { createServerSupabaseClient } from '@/lib/supabase-server';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import PropertyCard from '@/components/property/PropertyCard';
-import { Search, Home, TrendingUp, Shield, MapPin, ArrowRight, Building2, Trees, Building } from 'lucide-react';
+import HeroListingSlideshow from '@/components/home/HeroListingSlideshow';
+import { Search, Home, Shield, MapPin, ArrowRight, Building2, Trees, Building } from 'lucide-react';
 
 export const revalidate = 60;
+
+/** Public homepage “Happy Users” never shows below this (marketing baseline). */
+const DISPLAY_USERS_MIN = 10_365;
 
 async function getFeaturedProperties() {
   const supabase = createServerSupabaseClient();
@@ -33,15 +37,42 @@ async function getRecentProperties() {
 async function getStats() {
   const supabase = createServerSupabaseClient();
   const { count: totalProperties } = await supabase.from('properties').select('*', { count: 'exact', head: true }).eq('listing_status', 'active');
-  const { count: totalUsers } = await supabase.from('users').select('*', { count: 'exact', head: true });
-  return { totalProperties: totalProperties || 0, totalUsers: totalUsers || 0 };
+  const { count: totalUsersRaw } = await supabase.from('users').select('*', { count: 'exact', head: true });
+  const totalUsers = Math.max(DISPLAY_USERS_MIN, totalUsersRaw || 0);
+  return { totalProperties: totalProperties || 0, totalUsers };
+}
+
+/** One primary (or first) image per recent active listing for the hero slideshow */
+async function getHeroSlideImages(): Promise<string[]> {
+  const supabase = createServerSupabaseClient();
+  const { data } = await supabase
+    .from('properties')
+    .select('images:property_images(url, is_primary, display_order)')
+    .eq('listing_status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(28);
+
+  const urls: string[] = [];
+  for (const row of data || []) {
+    const imgs = row.images as { url: string; is_primary: boolean; display_order: number }[] | null;
+    if (!imgs?.length) continue;
+    const sorted = [...imgs].sort((a, b) => {
+      if (a.is_primary) return -1;
+      if (b.is_primary) return 1;
+      return (a.display_order ?? 0) - (b.display_order ?? 0);
+    });
+    const url = sorted[0]?.url;
+    if (url) urls.push(url);
+  }
+  return urls;
 }
 
 export default async function HomePage() {
-  const [featured, recent, stats] = await Promise.all([
+  const [featured, recent, stats, heroImages] = await Promise.all([
     getFeaturedProperties(),
     getRecentProperties(),
     getStats(),
+    getHeroSlideImages(),
   ]);
 
   return (
@@ -49,16 +80,30 @@ export default async function HomePage() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-925 via-slate-900 to-brand-950 text-white">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-600/20 rounded-full blur-3xl" />
+      <section className="relative overflow-hidden min-h-[520px] md:min-h-[600px] bg-slate-950 text-white">
+        <HeroListingSlideshow images={heroImages} />
+        <div
+          className="absolute inset-0 z-[2] bg-gradient-to-br from-slate-950/70 via-slate-900/45 to-brand-950/55 pointer-events-none"
+          aria-hidden
+        />
+        {/* Liquid glass: left emphasis; mask fades blur + tint seamlessly into the image (no hard edge) */}
+        <div
+          className="absolute inset-0 z-[3] pointer-events-none bg-slate-950/35 backdrop-blur-md [mask-image:linear-gradient(to_bottom,black_55%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_55%,transparent_100%)] md:inset-y-0 md:-left-[8%] md:h-full md:w-[78%] md:right-auto md:bg-gradient-to-r md:from-white/[0.14] md:via-white/[0.06] md:to-white/[0.02] md:backdrop-blur-2xl md:backdrop-saturate-150 md:[mask-image:linear-gradient(90deg,rgba(0,0,0,1)_0%,rgba(0,0,0,0.92)_18%,rgba(0,0,0,0.45)_55%,rgba(0,0,0,0)_82%)] md:[-webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,1)_0%,rgba(0,0,0,0.92)_18%,rgba(0,0,0,0.45)_55%,rgba(0,0,0,0)_82%)]"
+          aria-hidden
+        />
+        <div className="absolute inset-0 z-[2] overflow-hidden pointer-events-none md:z-[4]">
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-brand-600/15 rounded-full blur-3xl" />
           <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-brand-600/5 rounded-full blur-3xl" />
         </div>
 
         <div className="page-container relative z-10 py-24 md:py-36 lg:py-44">
-          <div className="max-w-3xl">
+          <div className="relative max-w-3xl">
+            {/* Mobile: glass capsule behind copy so text reads on busy slides */}
+            <div
+              className="absolute -inset-x-4 -inset-y-3 rounded-3xl bg-white/[0.1] backdrop-blur-xl backdrop-saturate-150 border border-white/20 shadow-xl md:hidden pointer-events-none"
+              aria-hidden
+            />
+            <div className="relative z-10">
             <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 mb-8 backdrop-blur-sm border border-white/10">
               <span className="w-2 h-2 bg-brand-400 rounded-full animate-pulse-soft" />
               <span className="text-sm text-brand-200 font-medium">
@@ -66,13 +111,13 @@ export default async function HomePage() {
               </span>
             </div>
 
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl leading-[1.1] mb-6">
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl leading-[1.1] mb-6 text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.45)]">
               Find your place
               <br />
-              <span className="text-brand-400">in the world</span>
+              <span className="text-brand-300 [text-shadow:0_2px_28px_rgba(0,0,0,0.5)]">in the world</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-400 max-w-xl mb-10 leading-relaxed">
+            <p className="text-lg md:text-xl text-slate-200 max-w-xl mb-10 leading-relaxed">
               Discover exceptional properties curated for modern living. Your dream home is just a search away.
             </p>
 
@@ -101,11 +146,12 @@ export default async function HomePage() {
                 <Link
                   key={label}
                   href={`/properties?property_type=${label.toLowerCase().replace(' ', '_').replace('for_', '')}&property_status=${label === 'For Rent' ? 'for_rent' : ''}`}
-                  className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-all"
+                  className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-sm text-slate-100 hover:bg-white/20 hover:text-white transition-all"
                 >
                   {label}
                 </Link>
               ))}
+            </div>
             </div>
           </div>
         </div>

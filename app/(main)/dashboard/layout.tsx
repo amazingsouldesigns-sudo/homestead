@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store';
 import { LayoutDashboard, Building, Heart, BarChart3, Settings, Plus, CreditCard } from 'lucide-react';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -46,9 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
                 {/* User info */}
                 <div className="flex items-center gap-3 mb-6 p-3 bg-slate-50 rounded-xl">
-                  <div className="w-10 h-10 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold">
-                    {user.full_name?.[0]?.toUpperCase() || 'U'}
-                  </div>
+                  <UserAvatar avatarUrl={user.avatar_url} size="lg" />
                   <div className="min-w-0">
                     <p className="font-semibold text-sm truncate">{user.full_name || 'User'}</p>
                     <p className="text-xs text-slate-500 capitalize">{user.role}</p>

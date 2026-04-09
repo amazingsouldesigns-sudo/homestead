@@ -20,13 +20,13 @@ export default function PropertiesPage() {
 
   const getFiltersFromParams = useCallback((): PropertyFilters => ({
     search: searchParams.get('search') || undefined,
-    property_type: (searchParams.get('property_type') as any) || undefined,
-    property_status: (searchParams.get('property_status') as any) || undefined,
+    property_type: (searchParams.get('property_type') as PropertyFilters['property_type']) || undefined,
+    property_status: (searchParams.get('property_status') as PropertyFilters['property_status']) || undefined,
     min_price: searchParams.get('min_price') ? Number(searchParams.get('min_price')) : undefined,
     max_price: searchParams.get('max_price') ? Number(searchParams.get('max_price')) : undefined,
     bedrooms: searchParams.get('bedrooms') ? Number(searchParams.get('bedrooms')) : undefined,
     bathrooms: searchParams.get('bathrooms') ? Number(searchParams.get('bathrooms')) : undefined,
-    sort_by: (searchParams.get('sort_by') as any) || 'newest',
+    sort_by: (searchParams.get('sort_by') as PropertyFilters['sort_by']) || 'newest',
     is_featured: searchParams.get('featured') === 'true' ? true : undefined,
     page: Number(searchParams.get('page') || 1),
     limit: 24,
@@ -54,10 +54,17 @@ export default function PropertiesPage() {
     if (f.is_featured) query = query.eq('is_featured', true);
 
     switch (f.sort_by) {
-      case 'price_asc': query = query.order('price', { ascending: true }); break;
-      case 'price_desc': query = query.order('price', { ascending: false }); break;
-      case 'oldest': query = query.order('created_at', { ascending: true }); break;
-      default: query = query.order('is_featured', { ascending: false }).order('created_at', { ascending: false });
+      case 'price_asc':
+        query = query.order('price', { ascending: true });
+        break;
+      case 'price_desc':
+        query = query.order('price', { ascending: false });
+        break;
+      case 'oldest':
+        query = query.order('created_at', { ascending: true });
+        break;
+      default:
+        query = query.order('is_featured', { ascending: false }).order('created_at', { ascending: false });
     }
 
     const page = f.page || 1;
@@ -65,7 +72,7 @@ export default function PropertiesPage() {
     query = query.range((page - 1) * limit, page * limit - 1);
 
     const { data, count } = await query;
-    setProperties(data || []);
+    setProperties((data || []) as Property[]);
     setTotal(count || 0);
     setLoading(false);
   }, []);
@@ -94,20 +101,23 @@ export default function PropertiesPage() {
   return (
     <div className="py-6 md:py-8">
       <div className="page-container">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="section-title">Properties</h1>
-            <p className="text-slate-500 mt-1">{total.toLocaleString()} properties found</p>
+            <p className="text-slate-500 mt-1">
+              {loading ? 'Loading…' : `${total.toLocaleString()} properties found`}
+            </p>
           </div>
           <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
             <button
+              type="button"
               onClick={() => setView('grid')}
               className={cn('p-2 rounded-lg transition-colors', view === 'grid' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-400')}
             >
               <Grid3X3 className="w-4 h-4" />
             </button>
             <button
+              type="button"
               onClick={() => setView('map')}
               className={cn('p-2 rounded-lg transition-colors', view === 'map' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-400')}
             >
@@ -116,10 +126,8 @@ export default function PropertiesPage() {
           </div>
         </div>
 
-        {/* Filters */}
         <SearchFilters filters={filters} onChange={handleFilterChange} />
 
-        {/* Content */}
         <div className="mt-6">
           {loading ? (
             <div className="flex items-center justify-center py-20">
@@ -149,18 +157,16 @@ export default function PropertiesPage() {
             </div>
           )}
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 mt-10">
               {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
+                  type="button"
                   onClick={() => handleFilterChange({ ...filters, page })}
                   className={cn(
                     'w-10 h-10 rounded-xl text-sm font-semibold transition-colors',
-                    page === currentPage
-                      ? 'bg-brand-600 text-white'
-                      : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    page === currentPage ? 'bg-brand-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
                   )}
                 >
                   {page}

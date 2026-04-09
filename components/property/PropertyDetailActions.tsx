@@ -3,14 +3,17 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase-browser';
-import { Heart, MessageCircle, Phone, Mail, Share2, User } from 'lucide-react';
+import { Heart, MessageCircle, Phone, Mail, Share2 } from 'lucide-react';
+import { HomesteadMark } from '@/components/ui/HomesteadMark';
+import { UserAvatar } from '@/components/ui/UserAvatar';
 import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 import type { Property, User as UserType } from '@/types';
+import ContactAgentCta from '@/components/property/ContactAgentCta';
 
 interface PropertyDetailActionsProps {
   property: Property;
-  seller: UserType;
+  seller: UserType | null;
 }
 
 export default function PropertyDetailActions({ property, seller }: PropertyDetailActionsProps) {
@@ -18,6 +21,8 @@ export default function PropertyDetailActions({ property, seller }: PropertyDeta
   const [saved, setSaved] = useState(false);
   const [showContact, setShowContact] = useState(false);
   const [message, setMessage] = useState('');
+  const brandName = (process.env.NEXT_PUBLIC_APP_NAME || 'Homestead').trim() || 'Homestead';
+  const isImported = property.listing_origin === 'imported';
 
   const handleSave = async () => {
     if (!user) {
@@ -47,39 +52,63 @@ export default function PropertyDetailActions({ property, seller }: PropertyDeta
 
   return (
     <div className="sticky top-24 space-y-4">
+      <div className="hidden lg:block">
+        <ContactAgentCta property={property} variant="sidebar" />
+      </div>
+
       {/* Seller Card */}
       <div className="card-elevated p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-bold text-lg">
-            {seller?.full_name?.[0]?.toUpperCase() || <User className="w-5 h-5" />}
-          </div>
+          {seller ? (
+            <UserAvatar avatarUrl={seller.avatar_url} size="xl" />
+          ) : (
+            <HomesteadMark className="w-12 h-12" iconClassName="w-6 h-6" />
+          )}
           <div>
-            <p className="font-semibold text-slate-900">{seller?.full_name || 'Property Owner'}</p>
-            <p className="text-sm text-slate-500">Seller</p>
+            <p className="font-semibold text-slate-900">
+              {seller?.full_name || (isImported ? brandName : 'Property owner')}
+            </p>
+            <p className="text-sm text-slate-500">
+              {seller
+                ? 'Seller'
+                : isImported
+                  ? [property.city, property.state].filter(Boolean).join(', ') || 'Imported listing'
+                  : 'Listing'}
+            </p>
           </div>
         </div>
+
+        {isImported && !seller && (
+          <p className="text-sm text-slate-600 mb-4">
+            This {property.city ? `${property.city} ` : ''}listing is on {brandName} from public market data. Open{' '}
+            <strong>Contact agent</strong> above to email us, copy the agent email, or schedule a call.
+          </p>
+        )}
 
         {seller?.bio && (
           <p className="text-sm text-slate-600 mb-4 line-clamp-3">{seller.bio}</p>
         )}
 
-        <button
-          onClick={() => setShowContact(!showContact)}
-          className="btn-primary w-full mb-3"
-        >
-          <MessageCircle className="w-4 h-4" />
-          Contact Seller
-        </button>
+        {seller && (
+          <button
+            type="button"
+            onClick={() => setShowContact(!showContact)}
+            className="btn-primary w-full mb-3"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Contact Seller
+          </button>
+        )}
 
-        {showContact && (
+        {showContact && seller && (
           <div className="space-y-3 animate-fade-in">
-            {seller?.email && (
+            {seller.email && (
               <a href={`mailto:${seller.email}?subject=Inquiry about ${property.title}`} className="flex items-center gap-2.5 text-sm text-slate-600 hover:text-brand-600">
                 <Mail className="w-4 h-4" />
                 {seller.email}
               </a>
             )}
-            {seller?.phone && (
+            {seller.phone && (
               <a href={`tel:${seller.phone}`} className="flex items-center gap-2.5 text-sm text-slate-600 hover:text-brand-600">
                 <Phone className="w-4 h-4" />
                 {seller.phone}
@@ -93,7 +122,7 @@ export default function PropertyDetailActions({ property, seller }: PropertyDeta
                 className="input-field text-sm min-h-[100px] resize-y"
               />
               <a
-                href={`mailto:${seller?.email}?subject=Inquiry about ${property.title}&body=${encodeURIComponent(message)}`}
+                href={`mailto:${seller.email}?subject=Inquiry about ${property.title}&body=${encodeURIComponent(message)}`}
                 className="btn-secondary w-full mt-2 text-sm"
               >
                 Send Message

@@ -4,10 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuthStore } from '@/lib/store';
 import {
-  Home,
   Search,
   Plus,
-  User,
   LogOut,
   Menu,
   X,
@@ -15,8 +13,9 @@ import {
   LayoutDashboard,
   Shield,
   ChevronDown,
+  User,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { HomesteadMark } from '@/components/ui/HomesteadMark';
 
 export default function Navbar() {
   const { user, signOut } = useAuthStore();
@@ -29,9 +28,10 @@ export default function Navbar() {
         <nav className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-600/25 group-hover:shadow-brand-600/40 transition-shadow">
-              <Home className="w-5 h-5 text-white" />
-            </div>
+            <HomesteadMark
+              className="w-9 h-9 transition-shadow group-hover:shadow-brand-600/40"
+              iconClassName="w-5 h-5"
+            />
             <span className="font-display text-xl text-slate-900 hidden sm:block">
               Homestead
             </span>
@@ -69,13 +69,16 @@ export default function Navbar() {
                     onClick={() => setProfileOpen(!profileOpen)}
                     className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full hover:bg-slate-100 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-full bg-brand-100 flex items-center justify-center text-brand-700 font-semibold text-sm">
-                      {user.full_name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
+                    <div
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700"
+                      aria-hidden
+                    >
+                      <User className="h-4 w-4" strokeWidth={2.25} />
                     </div>
                     <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate">
                       {user.full_name || 'Account'}
                     </span>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   </button>
 
                   {profileOpen && (

@@ -4,8 +4,10 @@ import { formatPrice, formatNumber, getPropertyTypeLabel, getStatusLabel, timeAg
 import ImageGallery from '@/components/property/ImageGallery';
 import PropertyMap from '@/components/maps/PropertyMap';
 import PropertyDetailActions from '@/components/property/PropertyDetailActions';
+import ContactAgentCta from '@/components/property/ContactAgentCta';
 import { Bed, Bath, Maximize, Calendar, Car, Ruler, MapPin, Eye } from 'lucide-react';
 import type { Metadata } from 'next';
+import type { Property } from '@/types';
 
 interface Props {
   params: { slug: string };
@@ -65,6 +67,10 @@ export default async function PropertyPage({ params }: Props) {
       <div className="page-container">
         {/* Image Gallery */}
         <ImageGallery images={sortedImages} title={property.title} />
+
+        <div className="mt-4 lg:hidden">
+          <ContactAgentCta property={property as Property} variant="inline" />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           {/* Main Content */}
@@ -156,7 +162,7 @@ export default async function PropertyPage({ params }: Props) {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <PropertyDetailActions property={property} seller={property.seller} />
+            <PropertyDetailActions property={property} seller={property.seller ?? null} />
           </div>
         </div>
       </div>

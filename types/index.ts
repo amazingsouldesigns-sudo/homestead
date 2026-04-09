@@ -15,9 +15,14 @@ export interface User {
   updated_at: string;
 }
 
+export type ListingOrigin = 'user' | 'imported';
+
 export interface Property {
   id: string;
-  seller_id: string;
+  seller_id: string | null;
+  listing_origin?: ListingOrigin;
+  external_id?: string | null;
+  external_source?: string | null;
   title: string;
   slug: string;
   description: string;
@@ -81,6 +86,18 @@ export interface SavedProperty {
   property_id: string;
   created_at: string;
   property?: Property;
+}
+
+export type ScheduleCallStatus = 'pending' | 'contacted' | 'dismissed';
+
+export interface ScheduleCallRequest {
+  id: string;
+  property_id: string;
+  user_id: string | null;
+  phone: string;
+  listing_url: string | null;
+  status: ScheduleCallStatus;
+  created_at: string;
 }
 
 export interface PropertyFilters {
