@@ -3,7 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase-browser';
-import { Building, Eye, Heart, DollarSign, TrendingUp, ArrowUpRight } from 'lucide-react';
+import {
+  ArrowUpRightIcon,
+  BuildingOfficeIcon,
+  CurrencyDollarIcon,
+  EyeIcon,
+  HeartIcon,
+} from '@heroicons/react/24/outline';
 import { formatPrice, formatNumber } from '@/lib/utils';
 import Link from 'next/link';
 import PropertyCard from '@/components/property/PropertyCard';
@@ -73,26 +79,26 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">
+        <h1 className="text-2xl font-semibold text-slate-100">
           Welcome back, {user?.full_name?.split(' ')[0] || 'there'}
         </h1>
-        <p className="text-slate-500 mt-1">Here&apos;s what&apos;s happening with your properties.</p>
+        <p className="mt-1 text-slate-500">Here&apos;s what&apos;s happening with your properties.</p>
       </div>
 
       {/* Stats */}
       {(user?.role === 'seller' || user?.role === 'admin') && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total Listings', value: stats.listings, icon: Building, color: 'text-brand-600 bg-brand-50' },
-            { label: 'Total Views', value: formatNumber(stats.views), icon: Eye, color: 'text-blue-600 bg-blue-50' },
-            { label: 'Total Saves', value: formatNumber(stats.saves), icon: Heart, color: 'text-red-600 bg-red-50' },
-            { label: 'Spent', value: formatPrice(stats.revenue), icon: DollarSign, color: 'text-emerald-600 bg-emerald-50' },
+            { label: 'Total Listings', value: stats.listings, icon: BuildingOfficeIcon, color: 'text-brand-400 bg-brand-500/15' },
+            { label: 'Total Views', value: formatNumber(stats.views), icon: EyeIcon, color: 'text-sky-400 bg-sky-500/15' },
+            { label: 'Total Saves', value: formatNumber(stats.saves), icon: HeartIcon, color: 'text-rose-400 bg-rose-500/15' },
+            { label: 'Spent', value: formatPrice(stats.revenue), icon: CurrencyDollarIcon, color: 'text-emerald-400 bg-emerald-500/15' },
           ].map((stat) => (
             <div key={stat.label} className="card p-5">
               <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-3`}>
                 <stat.icon className="w-5 h-5" />
               </div>
-              <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+              <p className="text-2xl font-bold text-slate-100">{stat.value}</p>
               <p className="text-sm text-slate-500 mt-0.5">{stat.label}</p>
             </div>
           ))}
@@ -103,9 +109,9 @@ export default function DashboardPage() {
       {recentListings.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Your Recent Listings</h2>
-            <Link href="/dashboard/listings" className="text-sm text-brand-600 font-medium flex items-center gap-1 hover:text-brand-700">
-              View All <ArrowUpRight className="w-3.5 h-3.5" />
+            <h2 className="text-lg font-semibold text-slate-100">Your Recent Listings</h2>
+            <Link href="/dashboard/listings" className="flex items-center gap-1 text-sm font-medium text-brand-400 hover:text-brand-300">
+              View All <ArrowUpRightIcon className="h-3.5 w-3.5" />
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -120,9 +126,9 @@ export default function DashboardPage() {
       {savedProps.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Saved Properties</h2>
-            <Link href="/dashboard/saved" className="text-sm text-brand-600 font-medium flex items-center gap-1 hover:text-brand-700">
-              View All <ArrowUpRight className="w-3.5 h-3.5" />
+            <h2 className="text-lg font-semibold text-slate-100">Saved Properties</h2>
+            <Link href="/dashboard/saved" className="flex items-center gap-1 text-sm font-medium text-brand-400 hover:text-brand-300">
+              View All <ArrowUpRightIcon className="h-3.5 w-3.5" />
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

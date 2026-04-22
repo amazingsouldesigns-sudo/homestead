@@ -8,7 +8,7 @@ import { createSlug } from '@/lib/utils';
 import ImageUploader from './ImageUploader';
 import toast from 'react-hot-toast';
 import type { Property } from '@/types';
-import { Save, Loader2 } from 'lucide-react';
+import { ArrowPathIcon, DocumentCheckIcon } from '@heroicons/react/24/outline';
 
 interface PropertyFormProps {
   property?: Property;
@@ -248,7 +248,7 @@ export default function PropertyForm({ property, mode }: PropertyFormProps) {
       {/* Submit */}
       <div className="flex items-center gap-3 pt-4 border-t border-slate-200">
         <button type="submit" disabled={saving} className="btn-primary">
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          {saving ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : <DocumentCheckIcon className="h-4 w-4" />}
           {mode === 'create' ? 'Create Listing' : 'Save Changes'}
         </button>
         <button type="button" onClick={() => router.back()} className="btn-secondary">

@@ -1,4 +1,4 @@
-import { Home } from 'lucide-react';
+import { HomeIcon } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
 /** Green + white house mark — matches the header logo. */
@@ -20,7 +20,7 @@ export function HomesteadMark({
         className
       )}
     >
-      <Home className={cn('text-white', iconClassName)} aria-hidden />
+      <HomeIcon className={cn('text-white', iconClassName)} aria-hidden />
     </div>
   );
 }

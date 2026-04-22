@@ -2,11 +2,18 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Bed, Bath, Maximize, MapPin, Sparkles } from 'lucide-react';
+import {
+  ArrowsPointingOutIcon,
+  HeartIcon,
+  HomeIcon,
+  MapPinIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline';
+import { BathMetricIcon, BedMetricIcon } from '@/components/icons/property-metrics';
 import { formatPrice, formatNumber, getPropertyTypeLabel, getStatusLabel, cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase-browser';
 import { useAuthStore } from '@/lib/store';
-import { useState, type SVGProps } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import type { Property } from '@/types';
 
@@ -56,8 +63,8 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
 
   return (
     <Link href={`/properties/${property.slug}`} className="group block">
-      <article className="card overflow-hidden">
-        <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+      <article className="card overflow-hidden transition-all duration-300 hover:border-[#C9A227]/45 hover:ring-[#C9A227]/25">
+        <div className="relative aspect-[4/3] overflow-hidden bg-zinc-800">
           {primaryImage ? (
             <Image
               src={primaryImage.url}
@@ -67,8 +74,8 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-slate-100">
-              <Home className="w-12 h-12 text-slate-300" />
+            <div className="flex h-full w-full items-center justify-center bg-zinc-800">
+              <HomeIcon className="h-12 w-12 text-zinc-500" />
             </div>
           )}
 
@@ -76,14 +83,14 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
             <span
               className={cn(
                 'badge shadow-sm',
-                property.property_status === 'for_sale' ? 'bg-brand-600 text-white' : 'bg-blue-600 text-white'
+                property.property_status === 'for_sale' ? 'bg-brand-600 text-white' : 'bg-emerald-700 text-white'
               )}
             >
               {getStatusLabel(property.property_status)}
             </span>
             {property.is_featured && (
               <span className="badge bg-amber-500 text-white shadow-sm">
-                <Sparkles className="w-3 h-3 mr-1" />
+                <SparklesIcon className="mr-1 h-3 w-3" />
                 Featured
               </span>
             )}
@@ -97,10 +104,10 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
               'absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm',
               isSaved
                 ? 'bg-red-500 text-white'
-                : 'bg-white/90 text-slate-600 hover:bg-white hover:text-red-500'
+                : 'gold-favorite-hover bg-zinc-900/90 text-slate-200 ring-1 ring-white/10 hover:bg-zinc-800'
             )}
           >
-            <Heart className={cn('w-4 h-4', isSaved && 'fill-current')} />
+            <HeartIcon className={cn('w-4 h-4', isSaved && 'fill-current')} />
           </button>
 
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 pt-10">
@@ -114,43 +121,36 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
         </div>
 
         <div className="p-4">
-          <h3 className="font-semibold text-slate-900 text-[15px] mb-1.5 line-clamp-1 group-hover:text-brand-600 transition-colors">
+          <h3 className="mb-1.5 line-clamp-1 text-[15px] font-semibold text-slate-100 transition-colors group-hover:text-[#E2C76D]">
             {property.title}
           </h3>
-          <div className="flex items-center gap-1.5 text-slate-500 text-sm mb-3">
-            <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+          <div className="mb-3 flex items-center gap-1.5 text-sm text-slate-400">
+            <MapPinIcon className="h-3.5 w-3.5 flex-shrink-0 text-slate-500" />
             <span className="truncate">
               {property.address}, {property.city}
             </span>
           </div>
-          <div className="flex items-center gap-4 text-sm text-slate-600">
+          <div className="flex items-center gap-4 text-sm text-slate-400">
             <div className="flex items-center gap-1.5">
-              <Bed className="w-4 h-4 text-slate-400" />
+              <BedMetricIcon className="h-4 w-4 text-slate-500" />
               <span>{property.bedrooms} bd</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Bath className="w-4 h-4 text-slate-400" />
+              <BathMetricIcon className="h-4 w-4 text-slate-500" />
               <span>{property.bathrooms} ba</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Maximize className="w-4 h-4 text-slate-400" />
+              <ArrowsPointingOutIcon className="h-4 w-4 text-slate-500" />
               <span>{formatNumber(property.sqft)} sqft</span>
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span className="badge bg-slate-100 text-slate-600">{getPropertyTypeLabel(property.property_type)}</span>
+          <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
+            <span className="badge bg-zinc-800 text-[#EEDDA3] ring-1 ring-[#C9A227]/35">
+              {getPropertyTypeLabel(property.property_type)}
+            </span>
           </div>
         </div>
       </article>
     </Link>
-  );
-}
-
-function Home(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
   );
 }

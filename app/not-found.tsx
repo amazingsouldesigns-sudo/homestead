@@ -1,15 +1,15 @@
 import Link from 'next/link';
-import { Home } from 'lucide-react';
+import { HomeIcon } from '@heroicons/react/24/outline';
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-sand-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4">
       <div className="text-center">
-        <div className="w-20 h-20 bg-brand-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Home className="w-10 h-10 text-brand-600" />
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-brand-500/15">
+          <HomeIcon className="h-10 w-10 text-brand-400" />
         </div>
-        <h1 className="font-display text-5xl text-slate-900 mb-3">404</h1>
-        <p className="text-xl text-slate-500 mb-8">
+        <h1 className="font-display mb-3 text-5xl text-slate-100">404</h1>
+        <p className="mb-8 text-xl text-slate-400">
           This property seems to have moved to a different neighborhood.
         </p>
         <div className="flex gap-3 justify-center">

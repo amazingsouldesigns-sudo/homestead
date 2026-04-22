@@ -9,6 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        accent: {
+          cyan: '#5eead4',
+          'cyan-dim': '#2dd4bf',
+          violet: '#a78bfa',
+          deep: '#0a0f1a',
+        },
         brand: {
           50: '#f0f7f4',
           100: '#d9ede3',
@@ -43,6 +49,24 @@ const config: Config = {
         display: ['var(--font-display)', 'serif'],
         body: ['var(--font-body)', 'sans-serif'],
         mono: ['var(--font-mono)', 'monospace'],
+      },
+      letterSpacing: {
+        futuristic: '0.22em',
+        widecaps: '0.12em',
+      },
+      boxShadow: {
+        glow: '0 0 48px -12px rgba(58, 135, 107, 0.35), 0 0 80px -24px rgba(34, 197, 94, 0.12)',
+        'glow-brand': '0 0 32px -8px rgba(58, 135, 107, 0.55), 0 0 48px -12px rgba(74, 222, 128, 0.2)',
+        'glow-tight': '0 0 18px -4px rgba(74, 222, 128, 0.45)',
+        'glass-elevate':
+          '0 8px 32px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0 1px rgba(58, 135, 107, 0.12)',
+      },
+      backgroundImage: {
+        'grid-fine':
+          'linear-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.04) 1px, transparent 1px)',
+      },
+      backgroundSize: {
+        grid: '40px 40px',
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-out forwards',

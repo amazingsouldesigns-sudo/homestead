@@ -1,0 +1,79 @@
+/* Hover / focus flip between two layers (after Uiverse.io by suleymanlaarabidev), tuned for Next/Image + a11y */
+
+.aspect {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: inherit;
+  overflow: hidden;
+  background: rgb(24 24 27);
+}
+
+.firstContent,
+.secondContent {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: inherit;
+  transition:
+    height 0.4s ease,
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+.firstContent {
+  top: 0;
+  height: 100%;
+  opacity: 1;
+  z-index: 1;
+}
+
+.secondContent {
+  bottom: 0;
+  height: 0%;
+  opacity: 0;
+  z-index: 2;
+  transform: rotate(90deg) scale(-1);
+}
+
+.cardFlip:hover .firstContent,
+.cardFlip:focus-visible .firstContent {
+  height: 0;
+  opacity: 0;
+}
+
+.cardFlip:hover .secondContent,
+.cardFlip:focus-visible .secondContent {
+  height: 100%;
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.overlay {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.88), rgb(0 0 0 / 0.28), transparent);
+}
+
+.copy {
+  pointer-events: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .copy {
+    padding: 1.25rem;
+  }
+}

@@ -4,7 +4,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase-browser';
-import { Home, Mail, Lock, User, Loader2, Eye, EyeOff } from 'lucide-react';
+import {
+  ArrowPathIcon,
+  CheckIcon,
+  EnvelopeIcon,
+  EyeIcon,
+  EyeSlashIcon,
+  HomeIcon,
+  LockClosedIcon,
+  UserIcon,
+} from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
 export default function SignupPage() {
@@ -63,7 +72,7 @@ export default function SignupPage() {
         </div>
         <div className="relative z-10 text-white max-w-md">
           <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-sm">
-            <Home className="w-8 h-8" />
+            <HomeIcon className="h-8 w-8" />
           </div>
           <h2 className="font-display text-4xl mb-4">Join Homestead today</h2>
           <p className="text-brand-100 text-lg leading-relaxed">
@@ -72,10 +81,8 @@ export default function SignupPage() {
           <div className="mt-10 space-y-4">
             {['Browse thousands of listings', 'Save your favorite properties', 'List and manage properties', 'Secure payment processing'].map((item) => (
               <div key={item} className="flex items-center gap-3">
-                <div className="w-6 h-6 rounded-full bg-brand-400/30 flex items-center justify-center">
-                  <svg className="w-3.5 h-3.5 text-brand-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-400/30">
+                  <CheckIcon className="h-3.5 w-3.5 text-brand-200" />
                 </div>
                 <span className="text-brand-100">{item}</span>
               </div>
@@ -85,23 +92,23 @@ export default function SignupPage() {
       </div>
 
       {/* Right panel - form */}
-      <div className="flex-1 flex items-center justify-center p-6 md:p-12 bg-sand-50">
+      <div className="flex flex-1 items-center justify-center bg-zinc-950 p-6 md:p-12">
         <div className="w-full max-w-md">
-          <Link href="/" className="flex items-center gap-2.5 mb-10 lg:hidden">
-            <div className="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-600/25">
-              <Home className="w-6 h-6 text-white" />
+          <Link href="/" className="mb-10 flex items-center gap-2.5 lg:hidden">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 shadow-lg shadow-brand-600/25">
+              <HomeIcon className="h-6 w-6 text-white" />
             </div>
-            <span className="font-display text-2xl">Homestead</span>
+            <span className="font-display text-2xl text-slate-100">Homestead</span>
           </Link>
 
-          <h1 className="font-display text-3xl text-slate-900 mb-2">Create Account</h1>
-          <p className="text-slate-500 mb-8">Start your real estate journey with Homestead.</p>
+          <h1 className="font-display mb-2 text-3xl text-slate-100">Create Account</h1>
+          <p className="mb-8 text-slate-400">Start your real estate journey with Homestead.</p>
 
           <form onSubmit={handleSignup} className="space-y-5">
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Full Name</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-300">Full Name</label>
               <div className="relative">
-                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <UserIcon className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   value={form.fullName}
@@ -114,9 +121,9 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Email</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-300">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <EnvelopeIcon className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="email"
                   value={form.email}
@@ -129,9 +136,9 @@ export default function SignupPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-1.5 block">Password</label>
+              <label className="mb-1.5 block text-sm font-medium text-slate-300">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <LockClosedIcon className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={form.password}
@@ -140,14 +147,18 @@ export default function SignupPage() {
                   placeholder="Minimum 6 characters"
                   required
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                >
+                  {showPassword ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                 </button>
               </div>
             </div>
 
             <div>
-              <label className="text-sm font-medium text-slate-700 mb-3 block">I want to</label>
+              <label className="mb-3 block text-sm font-medium text-slate-300">I want to</label>
               <div className="grid grid-cols-2 gap-3">
                 {[
                   { value: 'buyer', label: 'Buy / Rent', desc: 'Browse and save listings' },
@@ -157,28 +168,28 @@ export default function SignupPage() {
                     key={option.value}
                     type="button"
                     onClick={() => setForm({ ...form, role: option.value as 'buyer' | 'seller' })}
-                    className={`p-4 rounded-xl border-2 text-left transition-all ${
+                    className={`rounded-xl border-2 p-4 text-left transition-all ${
                       form.role === option.value
-                        ? 'border-brand-500 bg-brand-50'
-                        : 'border-slate-200 hover:border-slate-300'
+                        ? 'border-brand-500 bg-brand-500/10 text-slate-100 ring-1 ring-brand-500/30'
+                        : 'border-white/10 text-slate-300 hover:border-white/20'
                     }`}
                   >
-                    <p className="font-semibold text-sm">{option.label}</p>
-                    <p className="text-xs text-slate-500 mt-0.5">{option.desc}</p>
+                    <p className="text-sm font-semibold">{option.label}</p>
+                    <p className="mt-0.5 text-xs text-slate-500">{option.desc}</p>
                   </button>
                 ))}
               </div>
             </div>
 
             <button type="submit" disabled={loading} className="btn-primary w-full !py-3.5">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {loading ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : null}
               Create Account
             </button>
           </form>
 
-          <p className="text-center text-sm text-slate-500 mt-6">
+          <p className="mt-6 text-center text-sm text-slate-500">
             Already have an account?{' '}
-            <Link href="/login" className="text-brand-600 font-semibold hover:text-brand-700">
+            <Link href="/login" className="font-semibold text-brand-400 hover:text-brand-300">
               Sign in
             </Link>
           </p>

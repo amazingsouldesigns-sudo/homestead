@@ -3,17 +3,25 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/lib/store';
-import { LayoutDashboard, Building, Heart, BarChart3, Settings, Plus, CreditCard } from 'lucide-react';
+import {
+  BuildingOfficeIcon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+  HeartIcon,
+  PlusIcon,
+  Squares2X2Icon,
+} from '@heroicons/react/24/outline';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 const navItems = [
-  { href: '/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/dashboard/listings', label: 'My Listings', icon: Building, sellerOnly: true },
-  { href: '/dashboard/saved', label: 'Saved', icon: Heart },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3, sellerOnly: true },
+  { href: '/dashboard', label: 'Overview', icon: Squares2X2Icon },
+  { href: '/dashboard/listings', label: 'My Listings', icon: BuildingOfficeIcon, sellerOnly: true },
+  { href: '/dashboard/saved', label: 'Saved', icon: HeartIcon },
+  { href: '/dashboard/analytics', label: 'Analytics', icon: ChartBarIcon, sellerOnly: true },
+  { href: '/dashboard/settings', label: 'Settings', icon: Cog6ToothIcon },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -44,13 +52,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
             <div className="lg:sticky lg:top-24">
-              <div className="bg-white rounded-2xl border border-slate-100 p-4 shadow-sm">
+              <div className="rounded-2xl border border-white/10 bg-zinc-900/80 p-4 shadow-lg shadow-black/30 backdrop-blur-xl backdrop-saturate-150">
                 {/* User info */}
-                <div className="flex items-center gap-3 mb-6 p-3 bg-slate-50 rounded-xl">
+                <div className="mb-6 flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-950/80 p-3">
                   <UserAvatar avatarUrl={user.avatar_url} size="lg" />
                   <div className="min-w-0">
-                    <p className="font-semibold text-sm truncate">{user.full_name || 'User'}</p>
-                    <p className="text-xs text-slate-500 capitalize">{user.role}</p>
+                    <p className="truncate text-sm font-semibold text-slate-100">{user.full_name || 'User'}</p>
+                    <p className="text-xs capitalize text-slate-500">{user.role}</p>
                   </div>
                 </div>
 
@@ -65,11 +73,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         className={cn(
                           'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
                           pathname === item.href
-                            ? 'bg-brand-50 text-brand-700'
-                            : 'text-slate-600 hover:bg-slate-50'
+                            ? 'bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/30'
+                            : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
                         )}
                       >
-                        <item.icon className="w-4 h-4" />
+                        <item.icon className="h-4 w-4" />
                         {item.label}
                       </Link>
                     ))}
@@ -77,12 +85,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                 {/* Quick Actions */}
                 {(user.role === 'seller' || user.role === 'admin') && (
-                  <div className="mt-6 pt-4 border-t border-slate-100">
+                  <div className="mt-6 border-t border-white/10 pt-4">
                     <Link
                       href="/dashboard/listings?new=true"
                       className="btn-primary w-full text-sm"
                     >
-                      <Plus className="w-4 h-4" />
+                      <PlusIcon className="h-4 w-4" />
                       New Listing
                     </Link>
                   </div>

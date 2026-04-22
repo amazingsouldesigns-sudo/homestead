@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface ScheduleCallThankYouProps {
   open: boolean;
@@ -81,7 +81,7 @@ export default function ScheduleCallThankYou({
                 className="shrink-0 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
                 aria-label="Dismiss"
               >
-                <X className="h-4 w-4" />
+                <XMarkIcon className="h-4 w-4" />
               </button>
             </div>
           </div>

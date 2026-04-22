@@ -3,7 +3,13 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { formatPrice, timeAgo } from '@/lib/utils';
-import { Loader2, CreditCard, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import {
+  ArrowPathIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  CreditCardIcon,
+  XCircleIcon,
+} from '@heroicons/react/24/outline';
 
 export default function AdminPaymentsPage() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -24,24 +30,27 @@ export default function AdminPaymentsPage() {
 
   const statusIcon = (status: string) => {
     switch (status) {
-      case 'completed': return <CheckCircle2 className="w-4 h-4 text-emerald-500" />;
-      case 'failed': return <XCircle className="w-4 h-4 text-red-500" />;
-      default: return <Clock className="w-4 h-4 text-amber-500" />;
+      case 'completed':
+        return <CheckCircleIcon className="h-4 w-4 text-emerald-500" />;
+      case 'failed':
+        return <XCircleIcon className="h-4 w-4 text-red-500" />;
+      default:
+        return <ClockIcon className="h-4 w-4 text-amber-500" />;
     }
   };
 
   const statusColor = (status: string) => {
     switch (status) {
-      case 'completed': return 'bg-emerald-100 text-emerald-700';
-      case 'failed': return 'bg-red-100 text-red-700';
-      default: return 'bg-amber-100 text-amber-700';
+      case 'completed': return 'bg-emerald-500/20 text-emerald-300';
+      case 'failed': return 'bg-red-500/20 text-red-300';
+      default: return 'bg-amber-500/20 text-amber-300';
     }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+        <ArrowPathIcon className="h-8 w-8 animate-spin text-brand-600" />
       </div>
     );
   }
@@ -60,11 +69,11 @@ export default function AdminPaymentsPage() {
         </div>
         <div className="card p-5">
           <p className="text-sm text-slate-500 mb-1">Total Transactions</p>
-          <p className="text-2xl font-bold text-slate-900">{payments.length}</p>
+          <p className="text-2xl font-bold text-slate-100">{payments.length}</p>
         </div>
         <div className="card p-5">
           <p className="text-sm text-slate-500 mb-1">Successful</p>
-          <p className="text-2xl font-bold text-slate-900">
+          <p className="text-2xl font-bold text-slate-100">
             {payments.filter((p) => p.status === 'completed').length}
           </p>
         </div>
@@ -75,7 +84,7 @@ export default function AdminPaymentsPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
+              <tr className="border-b border-white/10 bg-zinc-900/80">
                 <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">User</th>
                 <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Property</th>
                 <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Type</th>
@@ -86,23 +95,23 @@ export default function AdminPaymentsPage() {
             </thead>
             <tbody>
               {payments.map((payment, i) => (
-                <tr key={payment.id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
+                <tr key={payment.id} className={i % 2 === 0 ? 'bg-zinc-950/40' : 'bg-zinc-900/25'}>
                   <td className="px-5 py-3.5">
-                    <p className="text-sm font-medium text-slate-900">{payment.user?.full_name || 'Unknown'}</p>
+                    <p className="text-sm font-medium text-slate-100">{payment.user?.full_name || 'Unknown'}</p>
                     <p className="text-xs text-slate-500">{payment.user?.email}</p>
                   </td>
                   <td className="px-5 py-3.5">
-                    <p className="text-sm text-slate-700 truncate max-w-[200px]">
+                    <p className="max-w-[200px] truncate text-sm text-slate-300">
                       {payment.property?.title || 'N/A'}
                     </p>
                   </td>
                   <td className="px-5 py-3.5">
-                    <span className="badge bg-slate-100 text-slate-600 text-xs capitalize">
+                    <span className="badge bg-white/10 text-xs capitalize text-slate-300">
                       {payment.payment_type.replace('listing_', '')}
                     </span>
                   </td>
                   <td className="px-5 py-3.5 text-right">
-                    <span className="text-sm font-semibold text-slate-900">{formatPrice(payment.amount)}</span>
+                    <span className="text-sm font-semibold text-slate-100">{formatPrice(payment.amount)}</span>
                   </td>
                   <td className="px-5 py-3.5 text-center">
                     <span className={`badge ${statusColor(payment.status)} capitalize text-xs`}>
@@ -119,7 +128,7 @@ export default function AdminPaymentsPage() {
         </div>
         {payments.length === 0 && (
           <div className="text-center py-12 text-slate-400">
-            <CreditCard className="w-10 h-10 mx-auto mb-2 opacity-50" />
+            <CreditCardIcon className="mx-auto mb-2 h-10 w-10 opacity-50" />
             <p>No payments yet</p>
           </div>
         )}

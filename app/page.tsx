@@ -4,7 +4,23 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import PropertyCard from '@/components/property/PropertyCard';
 import HeroListingSlideshow from '@/components/home/HeroListingSlideshow';
-import { Search, Home, Shield, MapPin, ArrowRight, Building2, Trees, Building } from 'lucide-react';
+import PropertyTypeBrowseCard from '@/components/home/PropertyTypeBrowseCard';
+import {
+  ArrowRightIcon,
+  BuildingOffice2Icon,
+  BuildingOfficeIcon,
+  HomeIcon,
+  MagnifyingGlassIcon,
+  MapPinIcon,
+  ShieldCheckIcon,
+} from '@heroicons/react/24/outline';
+import type { PropertyType } from '@/types';
+import {
+  pickDualPropertyPrimaryImages,
+  primaryUrlsInRichnessOrder,
+  rankListingsForPromotedSurfaces,
+  type PropertyRowWithImages,
+} from '@/lib/browse-type-card-media';
 
 export const revalidate = 60;
 
@@ -23,6 +39,12 @@ async function getFeaturedProperties() {
   return data || [];
 }
 
+/**
+ * Recent Properties: same rules as hero / browse cards — no zero-image listings;
+ * when any listing has 10+ photos, only those qualify for this strip (up to 8).
+ * Otherwise falls back to richest among listings with ≥1 photo.
+ * Fetches 48 newest actives, then re-orders by promoted ranking (image count, then date).
+ */
 async function getRecentProperties() {
   const supabase = createServerSupabaseClient();
   const { data } = await supabase
@@ -30,8 +52,23 @@ async function getRecentProperties() {
     .select('*, images:property_images(*), seller:users(full_name, avatar_url)')
     .eq('listing_status', 'active')
     .order('created_at', { ascending: false })
-    .limit(8);
-  return data || [];
+    .limit(48);
+
+  const rows = data || [];
+  if (rows.length === 0) return [];
+
+  const forRank: PropertyRowWithImages[] = rows.map((r: { id: string; created_at: string; images: unknown }) => ({
+    id: r.id,
+    created_at: r.created_at,
+    images: r.images as PropertyRowWithImages['images'],
+  }));
+
+  const ranked = rankListingsForPromotedSurfaces(forRank);
+  const byId = new Map(rows.map((r: { id: string }) => [r.id, r]));
+  return ranked
+    .slice(0, 8)
+    .map((r) => byId.get(r.propertyId))
+    .filter((row): row is NonNullable<typeof row> => row != null);
 }
 
 async function getStats() {
@@ -42,38 +79,51 @@ async function getStats() {
   return { totalProperties: totalProperties || 0, totalUsers };
 }
 
-/** One primary (or first) image per recent active listing for the hero slideshow */
+/** Hero slides: only listings with photos; more images first; sparse listings trail. */
 async function getHeroSlideImages(): Promise<string[]> {
   const supabase = createServerSupabaseClient();
   const { data } = await supabase
     .from('properties')
-    .select('images:property_images(url, is_primary, display_order)')
+    .select('id, created_at, images:property_images(url, is_primary, display_order)')
     .eq('listing_status', 'active')
     .order('created_at', { ascending: false })
-    .limit(28);
+    .limit(48);
 
-  const urls: string[] = [];
-  for (const row of data || []) {
-    const imgs = row.images as { url: string; is_primary: boolean; display_order: number }[] | null;
-    if (!imgs?.length) continue;
-    const sorted = [...imgs].sort((a, b) => {
-      if (a.is_primary) return -1;
-      if (b.is_primary) return 1;
-      return (a.display_order ?? 0) - (b.display_order ?? 0);
-    });
-    const url = sorted[0]?.url;
-    if (url) urls.push(url);
-  }
-  return urls;
+  const ranked = rankListingsForPromotedSurfaces((data || []) as PropertyRowWithImages[]);
+  return primaryUrlsInRichnessOrder(ranked, 28);
 }
 
+/** Browse card: top two distinct properties by image count (front / hover back). */
+async function getBrowseTypeCardImages(
+  propertyType: PropertyType
+): Promise<{ front: string | null; back: string | null }> {
+  const supabase = createServerSupabaseClient();
+  const { data } = await supabase
+    .from('properties')
+    .select('id, created_at, images:property_images(url, is_primary, display_order)')
+    .eq('listing_status', 'active')
+    .eq('property_type', propertyType)
+    .order('created_at', { ascending: false })
+    .limit(56);
+
+  const ranked = rankListingsForPromotedSurfaces((data || []) as PropertyRowWithImages[]);
+  return pickDualPropertyPrimaryImages(ranked);
+}
+
+const BROWSE_TYPES = ['house', 'apartment', 'condo', 'townhouse'] as const satisfies readonly PropertyType[];
+
 export default async function HomePage() {
-  const [featured, recent, stats, heroImages] = await Promise.all([
+  const [featured, recent, stats, heroImages, ...browseCardSets] = await Promise.all([
     getFeaturedProperties(),
     getRecentProperties(),
     getStats(),
     getHeroSlideImages(),
+    ...BROWSE_TYPES.map((t) => getBrowseTypeCardImages(t)),
   ]);
+
+  const browseCardByType = Object.fromEntries(
+    BROWSE_TYPES.map((t, i) => [t, browseCardSets[i] as { front: string | null; back: string | null }])
+  ) as Record<(typeof BROWSE_TYPES)[number], { front: string | null; back: string | null }>;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -104,9 +154,9 @@ export default async function HomePage() {
               aria-hidden
             />
             <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-2 mb-8 backdrop-blur-sm border border-white/10">
-              <span className="w-2 h-2 bg-brand-400 rounded-full animate-pulse-soft" />
-              <span className="text-sm text-brand-200 font-medium">
+            <div className="gold-chip inline-flex items-center gap-2 rounded-full px-4 py-2 mb-8 backdrop-blur-sm">
+              <span className="w-2 h-2 rounded-full animate-pulse-soft bg-[#C9A227]" />
+              <span className="text-sm font-medium text-[#F2E2A8]">
                 {stats.totalProperties.toLocaleString()} properties available
               </span>
             </div>
@@ -114,7 +164,7 @@ export default async function HomePage() {
             <h1 className="font-display text-5xl md:text-6xl lg:text-7xl leading-[1.1] mb-6 text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.45)]">
               Find your place
               <br />
-              <span className="text-brand-300 [text-shadow:0_2px_28px_rgba(0,0,0,0.5)]">in the world</span>
+              <span className="gold-label [text-shadow:0_2px_28px_rgba(0,0,0,0.5)]">in the world</span>
             </h1>
 
             <p className="text-lg md:text-xl text-slate-200 max-w-xl mb-10 leading-relaxed">
@@ -125,16 +175,16 @@ export default async function HomePage() {
             <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-2 border border-white/10 max-w-2xl">
               <form action="/properties" method="GET" className="flex flex-col sm:flex-row gap-2">
                 <div className="relative flex-1">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                  <MapPinIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
                     name="search"
                     placeholder="Enter city, neighborhood, or address..."
-                    className="w-full pl-12 pr-4 py-4 bg-white rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 text-[15px]"
+                    className="w-full rounded-xl border border-white/10 bg-zinc-900/90 py-4 pl-12 pr-4 text-[15px] text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
                   />
                 </div>
                 <button type="submit" className="btn-primary !py-4 !px-8 !rounded-xl whitespace-nowrap">
-                  <Search className="w-5 h-5" />
+                  <MagnifyingGlassIcon className="h-5 w-5" />
                   Search
                 </button>
               </form>
@@ -142,11 +192,18 @@ export default async function HomePage() {
 
             {/* Quick filters */}
             <div className="flex flex-wrap gap-2 mt-6">
-              {['Houses', 'Apartments', 'Condos', 'For Rent'].map((label) => (
+              {(
+                [
+                  { label: 'Houses', href: '/properties?property_type=house' },
+                  { label: 'Apartments', href: '/properties?property_type=apartment' },
+                  { label: 'Condos', href: '/properties?property_type=condo' },
+                  { label: 'For Rent', href: '/properties?property_status=for_rent' },
+                ] as const
+              ).map(({ label, href }) => (
                 <Link
                   key={label}
-                  href={`/properties?property_type=${label.toLowerCase().replace(' ', '_').replace('for_', '')}&property_status=${label === 'For Rent' ? 'for_rent' : ''}`}
-                  className="px-4 py-2 rounded-full bg-white/10 border border-white/20 text-sm text-slate-100 hover:bg-white/20 hover:text-white transition-all"
+                  href={href}
+                  className="gold-outline-chip px-4 py-2 rounded-full text-sm transition-all hover:bg-white/20 hover:text-white"
                 >
                   {label}
                 </Link>
@@ -158,19 +215,19 @@ export default async function HomePage() {
       </section>
 
       {/* Stats Bar */}
-      <section className="bg-white border-b border-slate-100">
+      <section className="border-b border-white/10 bg-zinc-900/60 backdrop-blur-xl">
         <div className="page-container py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
             {[
-              { label: 'Active Listings', value: stats.totalProperties.toLocaleString(), icon: Building2 },
-              { label: 'Happy Users', value: stats.totalUsers.toLocaleString(), icon: Home },
-              { label: 'Cities Covered', value: '50+', icon: MapPin },
-              { label: 'Trusted Agents', value: '200+', icon: Shield },
+              { label: 'Active Listings', value: stats.totalProperties.toLocaleString(), icon: BuildingOffice2Icon },
+              { label: 'Happy Users', value: stats.totalUsers.toLocaleString(), icon: HomeIcon },
+              { label: 'Cities Covered', value: '50+', icon: MapPinIcon },
+              { label: 'Trusted Agents', value: '200+', icon: ShieldCheckIcon },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <stat.icon className="w-6 h-6 text-brand-500 mx-auto mb-2" />
-                <p className="font-display text-2xl md:text-3xl text-slate-900">{stat.value}</p>
-                <p className="text-sm text-slate-500 mt-0.5">{stat.label}</p>
+                <stat.icon className="gold-stat-icon mx-auto mb-2 h-6 w-6" />
+                <p className="font-display text-2xl text-slate-100 md:text-3xl">{stat.value}</p>
+                <p className="mt-0.5 text-sm text-slate-400">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -183,11 +240,11 @@ export default async function HomePage() {
           <div className="page-container">
             <div className="flex items-end justify-between mb-10">
               <div>
-                <span className="text-brand-600 font-semibold text-sm uppercase tracking-wider">Curated Selection</span>
+                <span className="label-future gold-label">Curated Selection</span>
                 <h2 className="section-title mt-2">Featured Properties</h2>
               </div>
-              <Link href="/properties?featured=true" className="btn-ghost text-sm text-brand-600 hidden md:flex">
-                View All <ArrowRight className="w-4 h-4" />
+              <Link href="/properties?featured=true" className="btn-ghost gold-accent-link hidden text-sm md:flex">
+                View All <ArrowRightIcon className="h-4 w-4" />
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -200,29 +257,54 @@ export default async function HomePage() {
       )}
 
       {/* Property Types */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="border-y border-white/10 bg-zinc-900/50 py-16 backdrop-blur-xl md:py-24">
         <div className="page-container">
           <div className="text-center mb-12">
-            <span className="text-brand-600 font-semibold text-sm uppercase tracking-wider">Browse By Type</span>
+                <span className="label-future gold-label">Browse By Type</span>
             <h2 className="section-title mt-2">Explore Property Types</h2>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: 'Houses', icon: Home, type: 'house', color: 'bg-brand-50 text-brand-600 border-brand-100' },
-              { label: 'Apartments', icon: Building2, type: 'apartment', color: 'bg-blue-50 text-blue-600 border-blue-100' },
-              { label: 'Condos', icon: Building, type: 'condo', color: 'bg-purple-50 text-purple-600 border-purple-100' },
-              { label: 'Townhouses', icon: Trees, type: 'townhouse', color: 'bg-amber-50 text-amber-600 border-amber-100' },
-            ].map((item) => (
-              <Link
-                key={item.type}
-                href={`/properties?property_type=${item.type}`}
-                className={`p-6 rounded-2xl border ${item.color} hover:shadow-lg transition-all group text-center`}
-              >
-                <item.icon className="w-10 h-10 mx-auto mb-3 group-hover:scale-110 transition-transform" />
-                <h3 className="font-semibold text-lg">{item.label}</h3>
-                <p className="text-sm opacity-75 mt-1">Browse {item.label.toLowerCase()}</p>
-              </Link>
-            ))}
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {(
+              [
+                {
+                  title: 'Houses',
+                  browseLabel: 'Browse houses',
+                  type: 'house' as const,
+                  href: '/properties?property_type=house',
+                },
+                {
+                  title: 'Apartments',
+                  browseLabel: 'Browse apartments',
+                  type: 'apartment' as const,
+                  href: '/properties?property_type=apartment',
+                },
+                {
+                  title: 'Condos',
+                  browseLabel: 'Browse condos',
+                  type: 'condo' as const,
+                  href: '/properties?property_type=condo',
+                },
+                {
+                  title: 'Townhouses',
+                  browseLabel: 'Browse townhouses',
+                  type: 'townhouse' as const,
+                  href: '/properties?property_type=townhouse',
+                },
+              ] as const
+            ).map((item) => {
+              const { front, back } = browseCardByType[item.type];
+              return (
+                <PropertyTypeBrowseCard
+                  key={item.type}
+                  href={item.href}
+                  title={item.title}
+                  browseLabel={item.browseLabel}
+                  imageFront={front}
+                  imageBack={back}
+                  fallbackVariant={item.type}
+                />
+              );
+            })}
           </div>
         </div>
       </section>
@@ -233,11 +315,11 @@ export default async function HomePage() {
           <div className="page-container">
             <div className="flex items-end justify-between mb-10">
               <div>
-                <span className="text-brand-600 font-semibold text-sm uppercase tracking-wider">Just Listed</span>
+                <span className="label-future gold-label">Just Listed</span>
                 <h2 className="section-title mt-2">Recent Properties</h2>
               </div>
-              <Link href="/properties" className="btn-ghost text-sm text-brand-600 hidden md:flex">
-                Browse All <ArrowRight className="w-4 h-4" />
+              <Link href="/properties" className="btn-ghost gold-accent-link hidden text-sm md:flex">
+                Browse All <ArrowRightIcon className="h-4 w-4" />
               </Link>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -263,11 +345,11 @@ export default async function HomePage() {
             Join thousands of sellers who trust Homestead to showcase their properties to qualified buyers.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/signup" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-700 font-semibold rounded-xl hover:bg-brand-50 transition-all shadow-lg">
+            <Link href="/signup" className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/50 bg-white/85 px-8 py-4 font-semibold text-brand-700 shadow-lg backdrop-blur-md transition-all hover:bg-white hover:shadow-xl">
               Get Started Free
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRightIcon className="h-5 w-5" />
             </Link>
-            <Link href="/properties" className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-700/50 text-white font-semibold rounded-xl hover:bg-brand-700/70 transition-all border border-white/20">
+            <Link href="/properties" className="gold-btn inline-flex items-center justify-center gap-2 px-8 py-4 font-semibold rounded-xl transition-all border">
               Browse Properties
             </Link>
           </div>

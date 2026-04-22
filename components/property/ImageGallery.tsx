@@ -2,7 +2,12 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, X, Camera } from 'lucide-react';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PhotoIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import type { PropertyImage } from '@/types';
 
@@ -32,7 +37,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
       <div className="gallery-grid">
         <div className="bg-slate-100 flex items-center justify-center col-span-full aspect-[2/1]">
           <div className="text-center text-slate-400">
-            <Camera className="w-12 h-12 mx-auto mb-2" />
+            <PhotoIcon className="mx-auto mb-2 h-12 w-12" />
             <p>No images available</p>
           </div>
         </div>
@@ -73,7 +78,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
         onClick={() => setLightboxOpen(true)}
         className="mt-3 btn-secondary text-sm"
       >
-        <Camera className="w-4 h-4" />
+        <PhotoIcon className="h-4 w-4" />
         View All {uniqueImages.length} Photos
       </button>
 
@@ -84,14 +89,14 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
             onClick={() => setLightboxOpen(false)}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white z-10"
           >
-            <X className="w-5 h-5" />
+            <XMarkIcon className="h-5 w-5" />
           </button>
 
           <button
             onClick={prev}
             className="absolute left-4 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white z-10"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeftIcon className="h-6 w-6" />
           </button>
 
           <div className="relative w-full max-w-5xl aspect-[16/10] mx-16">
@@ -108,7 +113,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
             onClick={next}
             className="absolute right-4 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white z-10"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRightIcon className="h-6 w-6" />
           </button>
 
           {/* Counter */}

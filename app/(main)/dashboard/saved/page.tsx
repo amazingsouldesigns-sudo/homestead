@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase-browser';
 import PropertyCard from '@/components/property/PropertyCard';
-import { Heart, Loader2 } from 'lucide-react';
+import { ArrowPathIcon, HeartIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 
 export default function SavedPage() {
@@ -31,7 +31,7 @@ export default function SavedPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+        <ArrowPathIcon className="h-8 w-8 animate-spin text-brand-600" />
       </div>
     );
   }
@@ -45,7 +45,7 @@ export default function SavedPage() {
 
       {saved.length === 0 ? (
         <div className="text-center py-20 card-elevated">
-          <Heart className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+          <HeartIcon className="mx-auto mb-3 h-12 w-12 text-slate-300" />
           <p className="text-xl font-semibold text-slate-600 mb-2">No saved properties</p>
           <p className="text-slate-400 mb-6">Browse properties and save the ones you love</p>
           <Link href="/properties" className="btn-primary">

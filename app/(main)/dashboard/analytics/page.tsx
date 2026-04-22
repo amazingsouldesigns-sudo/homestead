@@ -4,7 +4,13 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase-browser';
 import { formatPrice, formatNumber, getListingStatusColor } from '@/lib/utils';
-import { Eye, Heart, TrendingUp, BarChart3, Loader2 } from 'lucide-react';
+import {
+  ArrowPathIcon,
+  ArrowTrendingUpIcon,
+  ChartBarIcon,
+  EyeIcon,
+  HeartIcon,
+} from '@heroicons/react/24/outline';
 
 export default function AnalyticsPage() {
   const { user } = useAuthStore();
@@ -29,7 +35,7 @@ export default function AnalyticsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+        <ArrowPathIcon className="h-8 w-8 animate-spin text-brand-600" />
       </div>
     );
   }
@@ -40,20 +46,20 @@ export default function AnalyticsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">Analytics</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-slate-100">Analytics</h1>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         {[
-          { label: 'Total Views', value: formatNumber(totalViews), icon: Eye, color: 'text-blue-600 bg-blue-50' },
-          { label: 'Total Saves', value: formatNumber(totalSaves), icon: Heart, color: 'text-red-600 bg-red-50' },
-          { label: 'Active Listings', value: activeCount, icon: TrendingUp, color: 'text-emerald-600 bg-emerald-50' },
+          { label: 'Total Views', value: formatNumber(totalViews), icon: EyeIcon, color: 'text-sky-400 bg-sky-500/15' },
+          { label: 'Total Saves', value: formatNumber(totalSaves), icon: HeartIcon, color: 'text-rose-400 bg-rose-500/15' },
+          { label: 'Active Listings', value: activeCount, icon: ArrowTrendingUpIcon, color: 'text-emerald-400 bg-emerald-500/15' },
         ].map((stat) => (
           <div key={stat.label} className="card p-5">
             <div className={`w-10 h-10 rounded-xl ${stat.color} flex items-center justify-center mb-3`}>
               <stat.icon className="w-5 h-5" />
             </div>
-            <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
+            <p className="text-2xl font-bold text-slate-100">{stat.value}</p>
             <p className="text-sm text-slate-500">{stat.label}</p>
           </div>
         ))}
@@ -61,16 +67,16 @@ export default function AnalyticsPage() {
 
       {/* Performance Table */}
       <div className="card-elevated overflow-hidden">
-        <div className="p-5 border-b border-slate-100">
-          <h2 className="font-semibold flex items-center gap-2">
-            <BarChart3 className="w-4 h-4 text-brand-600" />
+        <div className="border-b border-white/10 p-5">
+          <h2 className="flex items-center gap-2 font-semibold text-slate-100">
+            <ChartBarIcon className="h-4 w-4 text-brand-400" />
             Listing Performance
           </h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-slate-50">
+              <tr className="bg-zinc-900/80">
                 <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Property</th>
                 <th className="text-right text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Views</th>
                 <th className="text-right text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Saves</th>
@@ -80,18 +86,18 @@ export default function AnalyticsPage() {
             </thead>
             <tbody>
               {listings.map((listing, i) => (
-                <tr key={listing.id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
+                <tr key={listing.id} className={i % 2 === 0 ? 'bg-zinc-950/40' : 'bg-zinc-900/25'}>
                   <td className="px-5 py-3.5">
-                    <p className="font-medium text-sm text-slate-900 truncate max-w-[250px]">{listing.title}</p>
+                    <p className="max-w-[250px] truncate text-sm font-medium text-slate-100">{listing.title}</p>
                   </td>
                   <td className="px-5 py-3.5 text-right">
-                    <span className="text-sm font-medium text-slate-700">{formatNumber(listing.views_count)}</span>
+                    <span className="text-sm font-medium text-slate-300">{formatNumber(listing.views_count)}</span>
                   </td>
                   <td className="px-5 py-3.5 text-right">
-                    <span className="text-sm font-medium text-slate-700">{formatNumber(listing.saves_count)}</span>
+                    <span className="text-sm font-medium text-slate-300">{formatNumber(listing.saves_count)}</span>
                   </td>
                   <td className="px-5 py-3.5 text-right">
-                    <span className="text-sm font-semibold text-brand-600">{formatPrice(listing.price)}</span>
+                    <span className="text-sm font-semibold text-brand-400">{formatPrice(listing.price)}</span>
                   </td>
                   <td className="px-5 py-3.5 text-center">
                     <span className={`badge ${getListingStatusColor(listing.listing_status)} capitalize text-xs`}>

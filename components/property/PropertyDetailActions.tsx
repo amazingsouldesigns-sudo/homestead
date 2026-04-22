@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase-browser';
-import { Heart, MessageCircle, Phone, Mail, Share2 } from 'lucide-react';
+import {
+  ChatBubbleLeftRightIcon,
+  EnvelopeIcon,
+  HeartIcon,
+  PhoneIcon,
+  ShareIcon,
+} from '@heroicons/react/24/outline';
 import { HomesteadMark } from '@/components/ui/HomesteadMark';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import { cn } from '@/lib/utils';
@@ -65,10 +71,10 @@ export default function PropertyDetailActions({ property, seller }: PropertyDeta
             <HomesteadMark className="w-12 h-12" iconClassName="w-6 h-6" />
           )}
           <div>
-            <p className="font-semibold text-slate-900">
+            <p className="font-semibold text-slate-100">
               {seller?.full_name || (isImported ? brandName : 'Property owner')}
             </p>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-400">
               {seller
                 ? 'Seller'
                 : isImported
@@ -79,14 +85,14 @@ export default function PropertyDetailActions({ property, seller }: PropertyDeta
         </div>
 
         {isImported && !seller && (
-          <p className="text-sm text-slate-600 mb-4">
+          <p className="mb-4 text-sm text-slate-400">
             This {property.city ? `${property.city} ` : ''}listing is on {brandName} from public market data. Open{' '}
-            <strong>Contact agent</strong> above to email us, copy the agent email, or schedule a call.
+            <strong>Contact agent</strong> above to schedule a call first, then copy the agent email if you need it.
           </p>
         )}
 
         {seller?.bio && (
-          <p className="text-sm text-slate-600 mb-4 line-clamp-3">{seller.bio}</p>
+          <p className="mb-4 line-clamp-3 text-sm text-slate-400">{seller.bio}</p>
         )}
 
         {seller && (
@@ -95,7 +101,7 @@ export default function PropertyDetailActions({ property, seller }: PropertyDeta
             onClick={() => setShowContact(!showContact)}
             className="btn-primary w-full mb-3"
           >
-            <MessageCircle className="w-4 h-4" />
+            <ChatBubbleLeftRightIcon className="h-4 w-4" />
             Contact Seller
           </button>
         )}
@@ -103,14 +109,17 @@ export default function PropertyDetailActions({ property, seller }: PropertyDeta
         {showContact && seller && (
           <div className="space-y-3 animate-fade-in">
             {seller.email && (
-              <a href={`mailto:${seller.email}?subject=Inquiry about ${property.title}`} className="flex items-center gap-2.5 text-sm text-slate-600 hover:text-brand-600">
-                <Mail className="w-4 h-4" />
+              <a
+                href={`mailto:${seller.email}?subject=Inquiry about ${property.title}`}
+                className="flex items-center gap-2.5 text-sm text-slate-300 hover:text-brand-400"
+              >
+                <EnvelopeIcon className="h-4 w-4" />
                 {seller.email}
               </a>
             )}
             {seller.phone && (
-              <a href={`tel:${seller.phone}`} className="flex items-center gap-2.5 text-sm text-slate-600 hover:text-brand-600">
-                <Phone className="w-4 h-4" />
+              <a href={`tel:${seller.phone}`} className="flex items-center gap-2.5 text-sm text-slate-300 hover:text-brand-400">
+                <PhoneIcon className="h-4 w-4" />
                 {seller.phone}
               </a>
             )}
@@ -137,15 +146,15 @@ export default function PropertyDetailActions({ property, seller }: PropertyDeta
         <button
           onClick={handleSave}
           className={cn(
-            'btn-secondary flex-1',
+            'btn-secondary gold-favorite-hover flex-1',
             saved && 'bg-red-50 border-red-200 text-red-600'
           )}
         >
-          <Heart className={cn('w-4 h-4', saved && 'fill-current')} />
+          <HeartIcon className={cn('h-4 w-4', saved && 'fill-current')} />
           {saved ? 'Saved' : 'Save'}
         </button>
         <button onClick={handleShare} className="btn-secondary flex-1">
-          <Share2 className="w-4 h-4" />
+          <ShareIcon className="h-4 w-4" />
           Share
         </button>
       </div>

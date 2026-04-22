@@ -4,17 +4,18 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useAuthStore } from '@/lib/store';
 import {
-  Search,
-  Plus,
-  LogOut,
-  Menu,
-  X,
-  Heart,
-  LayoutDashboard,
-  Shield,
-  ChevronDown,
-  User,
-} from 'lucide-react';
+  ArrowRightOnRectangleIcon,
+  Bars3Icon,
+  ChevronDownIcon,
+  Cog6ToothIcon,
+  HeartIcon,
+  MagnifyingGlassIcon,
+  PlusIcon,
+  ShieldCheckIcon,
+  Squares2X2Icon,
+  UserIcon,
+  XMarkIcon,
+} from '@heroicons/react/24/outline';
 import { HomesteadMark } from '@/components/ui/HomesteadMark';
 
 export default function Navbar() {
@@ -23,7 +24,7 @@ export default function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-slate-200/60">
+    <header className="glass sticky top-0 z-50">
       <div className="page-container">
         <nav className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
@@ -32,7 +33,7 @@ export default function Navbar() {
               className="w-9 h-9 transition-shadow group-hover:shadow-brand-600/40"
               iconClassName="w-5 h-5"
             />
-            <span className="font-display text-xl text-slate-900 hidden sm:block">
+            <span className="font-display hidden bg-gradient-to-r from-white via-brand-300 to-brand-500 bg-clip-text text-xl text-transparent sm:block">
               Homestead
             </span>
           </Link>
@@ -40,18 +41,18 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-1">
             <Link href="/properties" className="btn-ghost text-sm">
-              <Search className="w-4 h-4" />
+              <MagnifyingGlassIcon className="h-4 w-4" />
               Browse
             </Link>
             {user?.role === 'seller' && (
               <Link href="/dashboard/listings?new=true" className="btn-ghost text-sm">
-                <Plus className="w-4 h-4" />
+                <PlusIcon className="h-4 w-4" />
                 List Property
               </Link>
             )}
             {user?.role === 'admin' && (
               <Link href="/admin" className="btn-ghost text-sm">
-                <Shield className="w-4 h-4" />
+                <ShieldCheckIcon className="h-4 w-4" />
                 Admin
               </Link>
             )}
@@ -62,63 +63,71 @@ export default function Navbar() {
             {user ? (
               <>
                 <Link href="/dashboard/saved" className="btn-ghost text-sm">
-                  <Heart className="w-4 h-4" />
+                  <HeartIcon className="h-4 w-4" />
                 </Link>
                 <div className="relative">
                   <button
                     onClick={() => setProfileOpen(!profileOpen)}
-                    className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full hover:bg-slate-100 transition-colors"
+                    className="flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/80 py-1.5 pl-2 pr-3 ring-1 ring-brand-500/20 transition-colors hover:border-brand-400/40 hover:shadow-glow-tight"
                   >
                     <div
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700"
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600/30 text-brand-200"
                       aria-hidden
                     >
-                      <User className="h-4 w-4" strokeWidth={2.25} />
+                      <UserIcon className="h-4 w-4" />
                     </div>
-                    <span className="text-sm font-medium text-slate-700 max-w-[120px] truncate">
+                    <span className="max-w-[120px] truncate text-sm font-medium text-slate-100">
                       {user.full_name || 'Account'}
                     </span>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <ChevronDownIcon className="h-3.5 w-3.5 shrink-0 text-slate-400" />
                   </button>
 
                   {profileOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-scale-in origin-top-right">
-                        <div className="px-4 py-2.5 border-b border-slate-100">
-                          <p className="text-sm font-semibold text-slate-900 truncate">{user.full_name || 'User'}</p>
-                          <p className="text-xs text-slate-500 truncate">{user.email}</p>
-                          <span className="badge mt-1.5 bg-brand-100 text-brand-700 capitalize text-[10px]">
+                      <div className="absolute right-0 z-50 mt-2 w-56 origin-top-right animate-scale-in rounded-2xl border border-white/10 bg-zinc-900 py-2 shadow-xl shadow-black/60 ring-1 ring-brand-500/25 backdrop-blur-xl">
+                        <div className="border-b border-white/10 px-4 py-2.5">
+                          <p className="truncate text-sm font-semibold text-slate-100">{user.full_name || 'User'}</p>
+                          <p className="truncate text-xs text-slate-400">{user.email}</p>
+                          <span className="badge mt-1.5 bg-brand-900/50 capitalize text-[10px] text-brand-200 ring-1 ring-brand-500/30">
                             {user.role}
                           </span>
                         </div>
                         <div className="py-1">
                           <Link
                             href="/dashboard"
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-200 hover:bg-white/5"
                             onClick={() => setProfileOpen(false)}
                           >
-                            <LayoutDashboard className="w-4 h-4 text-slate-400" />
+                            <Squares2X2Icon className="h-4 w-4 text-slate-500" />
                             Dashboard
                           </Link>
                           <Link
                             href="/dashboard/saved"
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-200 hover:bg-white/5"
                             onClick={() => setProfileOpen(false)}
                           >
-                            <Heart className="w-4 h-4 text-slate-400" />
+                            <HeartIcon className="h-4 w-4 text-slate-500" />
                             Saved Properties
                           </Link>
+                          <Link
+                            href="/dashboard/settings"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-200 hover:bg-white/5"
+                            onClick={() => setProfileOpen(false)}
+                          >
+                            <Cog6ToothIcon className="h-4 w-4 text-slate-500" />
+                            Settings
+                          </Link>
                         </div>
-                        <div className="border-t border-slate-100 pt-1">
+                        <div className="border-t border-white/10 pt-1">
                           <button
                             onClick={() => {
                               signOut();
                               setProfileOpen(false);
                             }}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 w-full"
+                            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-950/40"
                           >
-                            <LogOut className="w-4 h-4" />
+                            <ArrowRightOnRectangleIcon className="h-4 w-4" />
                             Sign Out
                           </button>
                         </div>
@@ -129,10 +138,10 @@ export default function Navbar() {
               </>
             ) : (
               <div className="flex items-center gap-2">
-                <Link href="/login" className="btn-ghost text-sm">
-                  Log In
+                <Link href="/login" className="panel-glow text-sm no-underline">
+                  <span className="panel-glow-inner !px-4 text-sm">Log In</span>
                 </Link>
-                <Link href="/signup" className="btn-primary text-sm !py-2.5 !px-5">
+                <Link href="/signup" className="btn-primary text-sm !px-5 !py-2.5">
                   Sign Up
                 </Link>
               </div>
@@ -141,68 +150,76 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-slate-100"
+            className="rounded-lg p-2 text-slate-200 hover:bg-white/10 md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {mobileOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
           </button>
         </nav>
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="md:hidden pb-4 border-t border-slate-100 pt-3 animate-fade-in">
+          <div className="animate-fade-in border-t border-white/10 pb-4 pt-3 md:hidden">
             <div className="flex flex-col gap-1">
               <Link
                 href="/properties"
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 text-sm font-medium"
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
                 onClick={() => setMobileOpen(false)}
               >
-                <Search className="w-4 h-4 text-slate-400" />
+                <MagnifyingGlassIcon className="h-4 w-4 text-slate-500" />
                 Browse Properties
               </Link>
               {user ? (
                 <>
                   <Link
                     href="/dashboard"
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 text-sm font-medium"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <LayoutDashboard className="w-4 h-4 text-slate-400" />
+                    <Squares2X2Icon className="h-4 w-4 text-slate-500" />
                     Dashboard
                   </Link>
                   <Link
                     href="/dashboard/saved"
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 text-sm font-medium"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
                     onClick={() => setMobileOpen(false)}
                   >
-                    <Heart className="w-4 h-4 text-slate-400" />
+                    <HeartIcon className="h-4 w-4 text-slate-500" />
                     Saved
+                  </Link>
+                  <Link
+                    href="/dashboard/settings"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    <Cog6ToothIcon className="h-4 w-4 text-slate-500" />
+                    Settings
                   </Link>
                   {user.role === 'seller' && (
                     <Link
                       href="/dashboard/listings?new=true"
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 text-sm font-medium"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
                       onClick={() => setMobileOpen(false)}
                     >
-                      <Plus className="w-4 h-4 text-slate-400" />
+                      <PlusIcon className="h-4 w-4 text-slate-500" />
                       List Property
                     </Link>
                   )}
                   {user.role === 'admin' && (
                     <Link
                       href="/admin"
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 text-sm font-medium"
+                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
                       onClick={() => setMobileOpen(false)}
                     >
-                      <Shield className="w-4 h-4 text-slate-400" />
+                      <ShieldCheckIcon className="h-4 w-4 text-slate-500" />
                       Admin Panel
                     </Link>
                   )}
                   <button
                     onClick={() => { signOut(); setMobileOpen(false); }}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-50 text-sm font-medium text-red-600"
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-950/40"
                   >
-                    <LogOut className="w-4 h-4" />
+                    <ArrowRightOnRectangleIcon className="h-4 w-4" />
                     Sign Out
                   </button>
                 </>

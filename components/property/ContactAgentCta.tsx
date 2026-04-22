@@ -2,15 +2,15 @@
 
 import { useCallback, useState } from 'react';
 import {
-  CalendarClock,
-  Check,
-  ChevronDown,
-  ChevronUp,
-  Copy,
-  Loader2,
-  Mail,
-  Phone,
-} from 'lucide-react';
+  ArrowPathIcon,
+  CalendarDaysIcon,
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ClipboardDocumentIcon,
+  EnvelopeIcon,
+  PhoneIcon,
+} from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import type { Property } from '@/types';
 import ScheduleCallThankYou from '@/components/property/ScheduleCallThankYou';
@@ -38,7 +38,6 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
   const [showScheduleForm, setShowScheduleForm] = useState(false);
   const [schedulePhone, setSchedulePhone] = useState('');
   const [scheduleSubmitting, setScheduleSubmitting] = useState(false);
-  // TODO: set back to false after previewing — shows thank-you slide-out on load
   const [thankYouOpen, setThankYouOpen] = useState(false);
   const closeThankYou = useCallback(() => setThankYouOpen(false), []);
   const emailRaw = process.env.NEXT_PUBLIC_CONTACT_AGENT_EMAIL ?? '';
@@ -98,13 +97,13 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
 
   const wrapClass =
     variant === 'inline'
-      ? 'lg:hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-md'
-      : 'rounded-2xl border border-slate-200 bg-white p-4 shadow-md';
+      ? 'lg:hidden rounded-2xl border border-white/10 bg-zinc-900/95 p-4 shadow-glass-elevate shadow-glow-tight ring-1 ring-brand-500/25 backdrop-blur-xl'
+      : 'rounded-2xl border border-white/10 bg-zinc-900/95 p-4 shadow-glass-elevate shadow-glow-tight ring-1 ring-brand-500/25 backdrop-blur-xl';
 
   const toggleClass =
     variant === 'inline'
-      ? 'flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-[15px] font-semibold text-slate-900 transition hover:bg-slate-100'
-      : 'flex w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3.5 text-left text-[15px] font-semibold text-slate-900 transition hover:bg-slate-100 sm:py-4 sm:text-base';
+      ? 'flex w-full items-center justify-between gap-2 rounded-xl border border-cyan-400/20 bg-white/40 px-4 py-3 text-left text-[15px] font-semibold text-slate-900 shadow-inner ring-1 ring-white/30 backdrop-blur-md transition hover:border-cyan-300/35 hover:bg-white/60'
+      : 'flex w-full items-center justify-between gap-2 rounded-xl border border-cyan-400/20 bg-white/40 px-4 py-3.5 text-left text-[15px] font-semibold text-slate-900 shadow-inner ring-1 ring-white/30 backdrop-blur-md transition hover:border-cyan-300/35 hover:bg-white/60 sm:py-4 sm:text-base';
 
   return (
     <>
@@ -116,55 +115,21 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
         aria-expanded={open}
       >
         <span className="flex items-center gap-2">
-          <Mail className="h-4 w-4 shrink-0 text-brand-600" aria-hidden />
+          <EnvelopeIcon className="h-4 w-4 shrink-0 text-brand-600" aria-hidden />
           Contact agent
         </span>
         {open ? (
-          <ChevronUp className="h-5 w-5 shrink-0 text-slate-500" aria-hidden />
+          <ChevronUpIcon className="h-5 w-5 shrink-0 text-slate-500" aria-hidden />
         ) : (
-          <ChevronDown className="h-5 w-5 shrink-0 text-slate-500" aria-hidden />
+          <ChevronDownIcon className="h-5 w-5 shrink-0 text-slate-500" aria-hidden />
         )}
       </button>
 
       {open ? (
-        <div className="mt-3 space-y-3 border-t border-slate-100 pt-3">
-          {email ? (
-            <>
-              <div
-                tabIndex={0}
-                className="rounded-xl border-2 border-brand-400/80 bg-gradient-to-b from-amber-50 to-brand-50/90 px-3 py-3 shadow-sm ring-2 ring-brand-200/40 outline-none focus-visible:ring-brand-500"
-              >
-                <p className="mb-1 text-center text-[11px] font-semibold uppercase tracking-wide text-brand-800">
-                  Agent email
-                </p>
-                <p className="select-all break-all text-center text-[15px] font-semibold leading-snug text-slate-900">
-                  {email}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => void copyEmail()}
-                className="btn-secondary flex w-full items-center justify-center gap-2 py-3 text-[15px]"
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
-                    Copied
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4 shrink-0" aria-hidden />
-                    Copy email
-                  </>
-                )}
-              </button>
-            </>
-          ) : (
-            <p className="text-center text-sm text-amber-800">
-              Set <code className="font-mono text-xs">NEXT_PUBLIC_CONTACT_AGENT_EMAIL</code> in{' '}
-              <code className="font-mono text-xs">.env.local</code>.
-            </p>
-          )}
+        <div className="mt-3 space-y-3 border-t border-white/10 pt-3">
+          <p className="text-center text-xs leading-relaxed text-slate-400">
+            Prefer we reach out first? <strong>Schedule a call</strong> below, then use the agent email if you still need it.
+          </p>
 
           {!showScheduleForm ? (
             <button
@@ -172,12 +137,12 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
               onClick={() => setShowScheduleForm(true)}
               className="btn-primary flex w-full items-center justify-center gap-2 py-3 text-[15px]"
             >
-              <CalendarClock className="h-4 w-4 shrink-0" aria-hidden />
+              <CalendarDaysIcon className="h-4 w-4 shrink-0" aria-hidden />
               Schedule a call
             </button>
           ) : (
             <div className="space-y-2">
-              <label htmlFor={`schedule-phone-${property.id}`} className="block text-xs font-semibold text-slate-700">
+              <label htmlFor={`schedule-phone-${property.id}`} className="block text-xs font-semibold text-slate-300">
                 Your phone number
               </label>
               <input
@@ -211,7 +176,7 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
                   className="btn-primary flex flex-1 items-center justify-center gap-2 py-2.5 text-sm disabled:opacity-60"
                 >
                   {scheduleSubmitting ? (
-                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                    <ArrowPathIcon className="h-4 w-4 animate-spin" aria-hidden />
                   ) : null}
                   Request call
                 </button>
@@ -219,12 +184,50 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
             </div>
           )}
 
+          {email ? (
+            <>
+              <div
+                tabIndex={0}
+                className="rounded-xl border border-brand-500/40 bg-zinc-950/80 px-3 py-3 shadow-glow-tight ring-1 ring-brand-400/30 outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              >
+                <p className="mb-1 text-center text-[11px] font-semibold uppercase tracking-wide text-brand-400">
+                  Agent email
+                </p>
+                <p className="select-all break-all text-center text-[15px] font-semibold leading-snug text-slate-100">
+                  {email}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => void copyEmail()}
+                className="btn-secondary flex w-full items-center justify-center gap-2 py-3 text-[15px]"
+              >
+                {copied ? (
+                  <>
+                    <CheckIcon className="h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <ClipboardDocumentIcon className="h-4 w-4 shrink-0" aria-hidden />
+                    Copy email
+                  </>
+                )}
+              </button>
+            </>
+          ) : (
+            <p className="text-center text-sm text-amber-400/90">
+              Set <code className="font-mono text-xs">NEXT_PUBLIC_CONTACT_AGENT_EMAIL</code> in{' '}
+              <code className="font-mono text-xs">.env.local</code>.
+            </p>
+          )}
+
           {phone ? (
             <a
               href={`tel:${phone.replace(/\s/g, '')}`}
-              className="flex w-full items-center justify-center gap-2 py-2 text-sm font-medium text-slate-600 hover:text-brand-600"
+              className="flex w-full items-center justify-center gap-2 py-2 text-sm font-medium text-slate-400 hover:text-brand-400"
             >
-              <Phone className="h-4 w-4 shrink-0" aria-hidden />
+              <PhoneIcon className="h-4 w-4 shrink-0" aria-hidden />
               {phone}
             </a>
           ) : null}

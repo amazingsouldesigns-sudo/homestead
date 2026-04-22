@@ -7,7 +7,7 @@
 
 DO $$
 DECLARE
-  v_email TEXT := 'you@example.com';  -- <-- CHANGE THIS
+  v_email TEXT := 'jjotaro710@gmail.com';  -- <-- CHANGE THIS
   v_user_id UUID;
 BEGIN
   SELECT id INTO v_user_id FROM public.users WHERE email = v_email LIMIT 1;

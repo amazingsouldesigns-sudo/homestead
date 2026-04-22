@@ -4,14 +4,20 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store';
 import { useEffect } from 'react';
-import { Shield, Building, Users, CreditCard, LayoutDashboard } from 'lucide-react';
+import {
+  BuildingOfficeIcon,
+  CreditCardIcon,
+  ShieldCheckIcon,
+  Squares2X2Icon,
+  UsersIcon,
+} from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
 const adminNav = [
-  { href: '/admin', label: 'Overview', icon: LayoutDashboard },
-  { href: '/admin/listings', label: 'Listings', icon: Building },
-  { href: '/admin/users', label: 'Users', icon: Users },
-  { href: '/admin/payments', label: 'Payments', icon: CreditCard },
+  { href: '/admin', label: 'Overview', icon: Squares2X2Icon },
+  { href: '/admin/listings', label: 'Listings', icon: BuildingOfficeIcon },
+  { href: '/admin/users', label: 'Users', icon: UsersIcon },
+  { href: '/admin/payments', label: 'Payments', icon: CreditCardIcon },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -39,27 +45,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="py-6 md:py-8">
       <div className="page-container">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-            <Shield className="w-5 h-5 text-red-600" />
+        <div className="mb-8 flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/15">
+            <ShieldCheckIcon className="h-5 w-5 text-red-400" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold">Admin Panel</h1>
+            <h1 className="text-xl font-semibold text-slate-100">Admin Panel</h1>
             <p className="text-sm text-slate-500">Manage your marketplace</p>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 bg-slate-100 rounded-xl p-1 mb-8 overflow-x-auto">
+        <div className="mb-8 flex gap-1 overflow-x-auto rounded-xl border border-white/10 bg-zinc-900/80 p-1">
           {adminNav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+                'flex items-center gap-2 whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium transition-colors',
                 pathname === item.href
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-brand-500/20 text-brand-200 shadow-sm ring-1 ring-brand-500/30'
+                  : 'text-slate-400 hover:text-slate-200'
               )}
             >
               <item.icon className="w-4 h-4" />

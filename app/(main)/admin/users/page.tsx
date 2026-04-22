@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase-browser';
 import { timeAgo } from '@/lib/utils';
-import { Loader2, Shield, Trash2 } from 'lucide-react';
+import { ArrowPathIcon, TrashIcon } from '@heroicons/react/24/outline';
 import { UserAvatar } from '@/components/ui/UserAvatar';
 import toast from 'react-hot-toast';
 
@@ -41,7 +41,7 @@ export default function AdminUsersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+        <ArrowPathIcon className="h-8 w-8 animate-spin text-brand-600" />
       </div>
     );
   }
@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-slate-50 border-b border-slate-100">
+            <tr className="border-b border-white/10 bg-zinc-900/80">
               <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">User</th>
               <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Role</th>
               <th className="text-left text-xs font-semibold text-slate-500 uppercase tracking-wider px-5 py-3">Joined</th>
@@ -60,12 +60,12 @@ export default function AdminUsersPage() {
           </thead>
           <tbody>
             {users.map((u, i) => (
-              <tr key={u.id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/50'}>
+              <tr key={u.id} className={i % 2 === 0 ? 'bg-zinc-950/40' : 'bg-zinc-900/25'}>
                 <td className="px-5 py-3.5">
                   <div className="flex items-center gap-3">
                     <UserAvatar avatarUrl={u.avatar_url} size="sm" />
                     <div>
-                      <p className="font-medium text-sm text-slate-900">{u.full_name || 'No name'}</p>
+                      <p className="text-sm font-medium text-slate-100">{u.full_name || 'No name'}</p>
                       <p className="text-xs text-slate-500">{u.email}</p>
                     </div>
                   </div>
@@ -90,7 +90,7 @@ export default function AdminUsersPage() {
                     className="btn-ghost p-2 text-xs text-red-500"
                     title="Delete user"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <TrashIcon className="h-3.5 w-3.5" />
                   </button>
                 </td>
               </tr>

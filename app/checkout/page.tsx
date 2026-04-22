@@ -5,7 +5,14 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase-browser';
 import Navbar from '@/components/layout/Navbar';
-import { CreditCard, Sparkles, FileText, Shield, Loader2, Check } from 'lucide-react';
+import {
+  ArrowPathIcon,
+  CheckIcon,
+  CreditCardIcon,
+  DocumentTextIcon,
+  ShieldCheckIcon,
+  SparklesIcon,
+} from '@heroicons/react/24/outline';
 import { formatPrice, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
@@ -13,7 +20,7 @@ const PLANS = {
   publish: {
     name: 'Publish Listing',
     price: 29.99,
-    icon: FileText,
+    icon: DocumentTextIcon,
     color: 'brand',
     features: [
       'List your property on Homestead',
@@ -26,7 +33,7 @@ const PLANS = {
   featured: {
     name: 'Featured Listing',
     price: 99.99,
-    icon: Sparkles,
+    icon: SparklesIcon,
     color: 'amber',
     features: [
       'Everything in Publish, plus:',
@@ -86,21 +93,21 @@ export default function CheckoutPage() {
   if (!initialized) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+        <ArrowPathIcon className="h-8 w-8 animate-spin text-brand-600" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-sand-50">
+    <div className="min-h-screen bg-transparent">
       <Navbar />
       <div className="page-container py-12 md:py-20">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="font-display text-3xl md:text-4xl text-slate-900 mb-3">
+            <h1 className="font-display mb-3 text-3xl text-slate-100 md:text-4xl">
               {type === 'featured' ? 'Upgrade to Featured' : 'Publish Your Listing'}
             </h1>
-            <p className="text-slate-500 text-lg">
+            <p className="text-lg text-slate-400">
               {type === 'featured'
                 ? 'Get maximum visibility for your property'
                 : 'Make your property visible to thousands of buyers'}
@@ -124,39 +131,41 @@ export default function CheckoutPage() {
                     'card p-6 text-left transition-all',
                     isSelected
                       ? key === 'featured'
-                        ? 'border-2 border-amber-400 shadow-lg shadow-amber-100 ring-2 ring-amber-400/20'
-                        : 'border-2 border-brand-500 shadow-lg shadow-brand-100 ring-2 ring-brand-500/20'
-                      : 'hover:shadow-md'
+                        ? 'border-2 border-amber-400/90 shadow-lg shadow-amber-500/10 ring-2 ring-amber-400/25'
+                        : 'border-2 border-brand-500 shadow-lg shadow-brand-500/15 ring-2 ring-brand-500/25'
+                      : 'hover:shadow-md hover:shadow-black/20'
                   )}
                 >
                   <div className="flex items-center justify-between mb-4">
                     <div className={cn(
                       'w-12 h-12 rounded-xl flex items-center justify-center',
-                      key === 'featured' ? 'bg-amber-50 text-amber-600' : 'bg-brand-50 text-brand-600'
+                      key === 'featured' ? 'bg-amber-500/15 text-amber-400' : 'bg-brand-500/15 text-brand-400'
                     )}>
                       <Icon className="w-6 h-6" />
                     </div>
                     {isSelected && (
                       <span className={cn(
                         'badge',
-                        key === 'featured' ? 'bg-amber-100 text-amber-700' : 'bg-brand-100 text-brand-700'
+                        key === 'featured' ? 'bg-amber-500/20 text-amber-300' : 'bg-brand-500/20 text-brand-300'
                       )}>
                         Selected
                       </span>
                     )}
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-900">{p.name}</h3>
-                  <p className="font-display text-3xl text-slate-900 mt-2">
+                  <h3 className="text-lg font-semibold text-slate-100">{p.name}</h3>
+                  <p className="font-display mt-2 text-3xl text-slate-100">
                     ${p.price}
-                    <span className="text-sm font-body text-slate-400 ml-1">one-time</span>
+                    <span className="ml-1 font-body text-sm text-slate-500">one-time</span>
                   </p>
                   <ul className="mt-4 space-y-2">
                     {p.features.map((f) => (
-                      <li key={f} className="flex items-start gap-2 text-sm text-slate-600">
-                        <Check className={cn(
-                          'w-4 h-4 mt-0.5 flex-shrink-0',
-                          key === 'featured' ? 'text-amber-500' : 'text-brand-500'
-                        )} />
+                      <li key={f} className="flex items-start gap-2 text-sm text-slate-400">
+                        <CheckIcon
+                          className={cn(
+                            'mt-0.5 h-4 w-4 flex-shrink-0',
+                            key === 'featured' ? 'text-amber-500' : 'text-brand-500'
+                          )}
+                        />
                         {f}
                       </li>
                     ))}
@@ -168,9 +177,9 @@ export default function CheckoutPage() {
 
           {/* Checkout Button */}
           <div className="card-elevated p-6 text-center">
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
-              <span className="text-slate-600">Total</span>
-              <span className="font-display text-2xl text-slate-900">${plan.price}</span>
+            <div className="mb-6 flex items-center justify-between border-b border-white/10 pb-4">
+              <span className="text-slate-400">Total</span>
+              <span className="font-display text-2xl text-slate-100">${plan.price}</span>
             </div>
             <button
               onClick={handleCheckout}
@@ -178,14 +187,14 @@ export default function CheckoutPage() {
               className="btn-primary w-full !py-4 text-lg"
             >
               {loading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <ArrowPathIcon className="h-5 w-5 animate-spin" />
               ) : (
-                <CreditCard className="w-5 h-5" />
+                <CreditCardIcon className="h-5 w-5" />
               )}
               {loading ? 'Redirecting to Stripe...' : `Pay $${plan.price}`}
             </button>
             <div className="flex items-center justify-center gap-2 mt-4 text-xs text-slate-400">
-              <Shield className="w-3.5 h-3.5" />
+              <ShieldCheckIcon className="h-3.5 w-3.5" />
               Secure payment powered by Stripe
             </div>
           </div>

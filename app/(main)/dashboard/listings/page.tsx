@@ -6,7 +6,15 @@ import { useAuthStore } from '@/lib/store';
 import { createClient } from '@/lib/supabase-browser';
 import PropertyForm from '@/components/property/PropertyForm';
 import { formatPrice, getListingStatusColor, timeAgo } from '@/lib/utils';
-import { Plus, Edit, Trash2, Eye, Sparkles, ArrowLeft, Loader2 } from 'lucide-react';
+import {
+  ArrowLeftIcon,
+  ArrowPathIcon,
+  EyeIcon,
+  PencilSquareIcon,
+  PlusIcon,
+  SparklesIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
@@ -75,11 +83,11 @@ export default function ListingsPage() {
           onClick={() => { setShowForm(false); setEditProperty(null); }}
           className="btn-ghost text-sm mb-4"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeftIcon className="h-4 w-4" />
           Back to Listings
         </button>
         <div className="card-elevated p-6 md:p-8">
-          <h1 className="text-2xl font-semibold mb-6">
+          <h1 className="mb-6 text-2xl font-semibold text-slate-100">
             {editProperty ? 'Edit Listing' : 'Create New Listing'}
           </h1>
           <PropertyForm
@@ -99,21 +107,21 @@ export default function ListingsPage() {
           <p className="text-slate-500 text-sm mt-1">{listings.length} properties</p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary text-sm">
-          <Plus className="w-4 h-4" />
+          <PlusIcon className="h-4 w-4" />
           New Listing
         </button>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+          <ArrowPathIcon className="h-8 w-8 animate-spin text-brand-600" />
         </div>
       ) : listings.length === 0 ? (
         <div className="text-center py-20 card-elevated">
-          <p className="text-xl font-semibold text-slate-600 mb-2">No listings yet</p>
-          <p className="text-slate-400 mb-6">Create your first property listing</p>
+          <p className="mb-2 text-xl font-semibold text-slate-300">No listings yet</p>
+          <p className="mb-6 text-slate-500">Create your first property listing</p>
           <button onClick={() => setShowForm(true)} className="btn-primary">
-            <Plus className="w-4 h-4" />
+            <PlusIcon className="h-4 w-4" />
             Create Listing
           </button>
         </div>
@@ -124,7 +132,7 @@ export default function ListingsPage() {
             return (
               <div key={listing.id} className="card p-4 flex flex-col sm:flex-row gap-4">
                 {/* Thumbnail */}
-                <div className="w-full sm:w-32 h-24 rounded-xl overflow-hidden bg-slate-100 flex-shrink-0 relative">
+                <div className="relative h-24 w-full flex-shrink-0 overflow-hidden rounded-xl bg-zinc-800 sm:w-32">
                   {primaryImage ? (
                     <Image src={primaryImage.url} alt={listing.title} fill className="object-cover" sizes="128px" />
                   ) : (
@@ -136,7 +144,7 @@ export default function ListingsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-slate-900 truncate">{listing.title}</h3>
+                      <h3 className="truncate font-semibold text-slate-100">{listing.title}</h3>
                       <p className="text-sm text-slate-500 truncate">{listing.address}, {listing.city}</p>
                     </div>
                     <span className={`badge ${getListingStatusColor(listing.listing_status)} flex-shrink-0 capitalize`}>
@@ -144,8 +152,11 @@ export default function ListingsPage() {
                     </span>
                   </div>
                   <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
-                    <span className="font-semibold text-brand-600">{formatPrice(listing.price)}</span>
-                    <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" />{listing.views_count} views</span>
+                    <span className="font-semibold text-brand-400">{formatPrice(listing.price)}</span>
+                    <span className="flex items-center gap-1">
+                      <EyeIcon className="h-3.5 w-3.5" />
+                      {listing.views_count} views
+                    </span>
                     <span>{timeAgo(listing.created_at)}</span>
                   </div>
                 </div>
@@ -156,16 +167,16 @@ export default function ListingsPage() {
                     href={`/dashboard/listings?edit=${listing.id}`}
                     className="btn-ghost text-xs p-2"
                   >
-                    <Edit className="w-3.5 h-3.5" />
+                    <PencilSquareIcon className="h-3.5 w-3.5" />
                   </Link>
                   {listing.listing_status === 'draft' && (
-                    <button onClick={() => handlePublish(listing)} className="btn-ghost text-xs p-2 text-brand-600">
-                      <Sparkles className="w-3.5 h-3.5" />
+                    <button onClick={() => handlePublish(listing)} className="btn-ghost p-2 text-xs text-brand-400">
+                      <SparklesIcon className="h-3.5 w-3.5" />
                     </button>
                   )}
                   {listing.listing_status === 'active' && !listing.is_featured && (
                     <button onClick={() => handleFeature(listing)} className="btn-ghost text-xs p-2 text-amber-600" title="Promote to featured">
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <SparklesIcon className="h-3.5 w-3.5" />
                     </button>
                   )}
                   <button
@@ -173,7 +184,11 @@ export default function ListingsPage() {
                     disabled={deleting === listing.id}
                     className="btn-ghost text-xs p-2 text-red-500"
                   >
-                    {deleting === listing.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                    {deleting === listing.id ? (
+                      <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <TrashIcon className="h-3.5 w-3.5" />
+                    )}
                   </button>
                 </div>
               </div>

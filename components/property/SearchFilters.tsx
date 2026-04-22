@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
+import { FunnelIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import type { PropertyFilters } from '@/types';
 
@@ -35,11 +35,16 @@ export default function SearchFilters({ filters, onChange, compact }: SearchFilt
   ].filter(Boolean).length;
 
   return (
-    <div className={cn('bg-white rounded-2xl border border-slate-200 shadow-sm', compact ? 'p-3' : 'p-4 md:p-5')}>
+    <div
+      className={cn(
+        'rounded-2xl border border-white/10 bg-zinc-900/90 shadow-glass-elevate shadow-glow-tight ring-1 ring-brand-500/20 backdrop-blur-xl',
+        compact ? 'p-3' : 'p-4 md:p-5'
+      )}
+    >
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <MagnifyingGlassIcon className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             placeholder="Search by city, address, or keyword..."
@@ -59,7 +64,7 @@ export default function SearchFilters({ filters, onChange, compact }: SearchFilt
             showMore && 'bg-brand-50 border-brand-200 text-brand-700'
           )}
         >
-          <SlidersHorizontal className="w-4 h-4" />
+          <FunnelIcon className="h-4 w-4" />
           {activeFiltersCount > 0 && (
             <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
               {activeFiltersCount}
@@ -178,7 +183,7 @@ export default function SearchFilters({ filters, onChange, compact }: SearchFilt
             </div>
             {activeFiltersCount > 0 && (
               <button onClick={clearFilters} className="text-sm text-red-500 hover:text-red-600 font-medium flex items-center gap-1">
-                <X className="w-3.5 h-3.5" />
+                <XMarkIcon className="h-3.5 w-3.5" />
                 Clear Filters
               </button>
             )}

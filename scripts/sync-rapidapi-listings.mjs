@@ -17,6 +17,10 @@
  * RAPIDAPI_FETCH_DETAIL_PHOTOS — when not "false", calls /v3/property-detail per listing
  * to merge a full photo gallery (search often returns only 1–2 previews). Uses extra API quota.
  * RAPIDAPI_DETAIL_DELAY_MS — pause between detail calls to reduce throttling (default 120).
+ *
+ * RAPIDAPI_BACKFILL_ONLY=1 — skip for-sale import; walk existing imported rows in Supabase,
+ * call property-detail per external_id, merge with current images, replace if count increases.
+ * Optional: RAPIDAPI_BACKFILL_CITY / RAPIDAPI_BACKFILL_STATE_CODE (else uses SYNC_* if set).
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -33,7 +37,8 @@ const envCandidates = [
   join(__dirname, '..', '.env'),
 ];
 const envFile = envCandidates.find((p) => existsSync(p));
-if (envFile) config({ path: envFile, override: true });
+// Do not override env vars explicitly provided by the shell (e.g. PowerShell $env:...).
+if (envFile) config({ path: envFile, override: false });
 
 /** Line-based parse (handles BOM; complements dotenv if a line is skipped) */
 function loadEnvPlain(path) {
@@ -52,7 +57,7 @@ function loadEnvPlain(path) {
     ) {
       val = val.slice(1, -1);
     }
-    process.env[key] = val;
+    if (process.env[key] === undefined) process.env[key] = val;
   }
 }
 if (envFile) loadEnvPlain(envFile);
@@ -547,6 +552,83 @@ async function upsertListing(supabase, row) {
   return { id: inserted.id, updated: false };
 }
 
+async function backfillImportedPhotosOnly(supabase, key, host) {
+  const city = (process.env.RAPIDAPI_BACKFILL_CITY || process.env.RAPIDAPI_SYNC_CITY || '').trim();
+  const state = (process.env.RAPIDAPI_BACKFILL_STATE_CODE || process.env.RAPIDAPI_SYNC_STATE_CODE || '')
+    .trim()
+    .toUpperCase()
+    .slice(0, 2);
+  const cap = maxPhotosPerListing();
+  const delayMs = Math.max(0, Number(process.env.RAPIDAPI_DETAIL_DELAY_MS ?? 120) || 0);
+  const pageSize = 50;
+  let from = 0;
+  let improved = 0;
+  let unchanged = 0;
+  let failed = 0;
+
+  console.log('Backfill-only mode: property-detail → merge → replace when photo count increases.');
+  console.log('Filter:', {
+    city: city || '(any)',
+    state: state || '(any)',
+    cap,
+  });
+
+  while (true) {
+    let q = supabase
+      .from('properties')
+      .select('id, external_id, city, state')
+      .eq('listing_origin', 'imported')
+      .eq('external_source', EXTERNAL_SOURCE)
+      .not('external_id', 'is', null)
+      .order('created_at', { ascending: true })
+      .range(from, from + pageSize - 1);
+    if (city) q = q.ilike('city', city);
+    if (state) q = q.eq('state', state);
+
+    const { data: props, error } = await q;
+    if (error) {
+      console.error('Supabase query failed:', error.message || error);
+      process.exit(1);
+    }
+    if (!props?.length) break;
+
+    for (const p of props) {
+      try {
+        const { data: imgs } = await supabase
+          .from('property_images')
+          .select('url')
+          .eq('property_id', p.id)
+          .order('display_order', { ascending: true });
+        const existing = (imgs || []).map((r) => r.url).filter(Boolean);
+
+        const detailUrls = await fetchDetailPhotoUrls(p.external_id, key, host);
+        const merged = dedupePhotoUrls([...detailUrls, ...existing]).slice(0, cap);
+
+        if (merged.length > existing.length) {
+          await replaceImages(supabase, p.id, merged);
+          improved += 1;
+          console.log(`Photos +${merged.length - existing.length} (${existing.length}→${merged.length}) id=${p.external_id}`);
+        } else {
+          unchanged += 1;
+        }
+      } catch (e) {
+        failed += 1;
+        console.error('Backfill failed', p.external_id, e.message || e);
+      }
+      if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+    }
+
+    from += pageSize;
+  }
+
+  console.log(`Backfill done. Improved: ${improved}, unchanged: ${unchanged}, errors: ${failed}.`);
+  if (improved === 0) {
+    console.warn(
+      'No listings gained extra photos. The RapidAPI property-detail payload likely does not include more URLs than you already have — other sites use different data feeds.'
+    );
+  }
+}
+
 function buildForSaleUrl() {
   const base = (process.env.RAPIDAPI_BASE_URL || 'https://us-real-estate.p.rapidapi.com').replace(
     /\/$/,
@@ -594,6 +676,11 @@ async function main() {
     process.env.SUPABASE_SERVICE_ROLE_KEY,
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
+
+  if (process.env.RAPIDAPI_BACKFILL_ONLY === '1') {
+    await backfillImportedPhotosOnly(supabase, key, host);
+    return;
+  }
 
   console.log('Fetching:', url.replace(key, '***'));
 

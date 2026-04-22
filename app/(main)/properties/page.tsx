@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase-browser';
 import PropertyCard from '@/components/property/PropertyCard';
 import SearchFilters from '@/components/property/SearchFilters';
 import PropertyMap from '@/components/maps/PropertyMap';
-import { Map, Grid3X3, Loader2 } from 'lucide-react';
+import { ArrowPathIcon, MapIcon, TableCellsIcon } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import type { Property, PropertyFilters } from '@/types';
 
@@ -104,24 +104,34 @@ export default function PropertiesPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="section-title">Properties</h1>
-            <p className="text-slate-500 mt-1">
+            <p className="mt-1 text-slate-400">
               {loading ? 'Loading…' : `${total.toLocaleString()} properties found`}
             </p>
           </div>
-          <div className="flex items-center gap-1 bg-slate-100 rounded-xl p-1">
+          <div className="flex items-center gap-1 rounded-xl border border-white/10 bg-zinc-900/80 p-1 ring-1 ring-brand-500/20 backdrop-blur-md">
             <button
               type="button"
               onClick={() => setView('grid')}
-              className={cn('p-2 rounded-lg transition-colors', view === 'grid' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-400')}
+              className={cn(
+                'rounded-lg p-2 transition-colors',
+                view === 'grid'
+                  ? 'bg-zinc-800 text-slate-100 shadow-inner ring-1 ring-brand-500/30'
+                  : 'text-slate-400 hover:bg-white/5'
+              )}
             >
-              <Grid3X3 className="w-4 h-4" />
+              <TableCellsIcon className="h-4 w-4" />
             </button>
             <button
               type="button"
               onClick={() => setView('map')}
-              className={cn('p-2 rounded-lg transition-colors', view === 'map' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-400')}
+              className={cn(
+                'rounded-lg p-2 transition-colors',
+                view === 'map'
+                  ? 'bg-zinc-800 text-slate-100 shadow-inner ring-1 ring-brand-500/30'
+                  : 'text-slate-400 hover:bg-white/5'
+              )}
             >
-              <Map className="w-4 h-4" />
+              <MapIcon className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -131,12 +141,12 @@ export default function PropertiesPage() {
         <div className="mt-6">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+              <ArrowPathIcon className="h-8 w-8 animate-spin text-brand-600" />
             </div>
           ) : properties.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-xl font-semibold text-slate-600 mb-2">No properties found</p>
-              <p className="text-slate-400">Try adjusting your search or filters</p>
+              <p className="mb-2 text-xl font-semibold text-slate-300">No properties found</p>
+              <p className="text-slate-500">Try adjusting your search or filters</p>
             </div>
           ) : view === 'map' ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -166,7 +176,9 @@ export default function PropertiesPage() {
                   onClick={() => handleFilterChange({ ...filters, page })}
                   className={cn(
                     'w-10 h-10 rounded-xl text-sm font-semibold transition-colors',
-                    page === currentPage ? 'bg-brand-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    page === currentPage
+                      ? 'bg-brand-600 text-white'
+                      : 'border border-white/10 bg-zinc-800/90 text-slate-300 shadow-sm ring-1 ring-brand-500/15 hover:border-brand-400/40 hover:bg-zinc-800'
                   )}
                 >
                   {page}

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import Image from 'next/image';
-import { Upload, X, Star, GripVertical } from 'lucide-react';
+import { ArrowUpTrayIcon, StarIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { createClient } from '@/lib/supabase-browser';
 import { useAuthStore } from '@/lib/store';
 import { cn } from '@/lib/utils';
@@ -114,7 +114,7 @@ export default function ImageUploader({ images, onChange, propertyId }: ImageUpl
           className="hidden"
           onChange={(e) => handleUpload(e.target.files)}
         />
-        <Upload className={cn('w-8 h-8 mx-auto mb-3', uploading ? 'text-brand-500 animate-pulse' : 'text-slate-400')} />
+        <ArrowUpTrayIcon className={cn('mx-auto mb-3 h-8 w-8', uploading ? 'animate-pulse text-brand-500' : 'text-slate-400')} />
         <p className="text-sm font-medium text-slate-700">
           {uploading ? 'Uploading...' : 'Click or drag photos here'}
         </p>
@@ -139,14 +139,14 @@ export default function ImageUploader({ images, onChange, propertyId }: ImageUpl
                   )}
                   title="Set as primary"
                 >
-                  <Star className={cn('w-4 h-4', img.is_primary && 'fill-current')} />
+                  <StarIcon className={cn('h-4 w-4', img.is_primary && 'fill-current')} />
                 </button>
                 <button
                   onClick={() => removeImage(i)}
                   className="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600"
                   title="Remove"
                 >
-                  <X className="w-4 h-4" />
+                  <XMarkIcon className="h-4 w-4" />
                 </button>
               </div>
               {img.is_primary && (
