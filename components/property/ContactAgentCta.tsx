@@ -43,6 +43,12 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
   const emailRaw = process.env.NEXT_PUBLIC_CONTACT_AGENT_EMAIL ?? '';
   const email = normalizeContactEmail(emailRaw);
   const phone = process.env.NEXT_PUBLIC_CONTACT_AGENT_PHONE ?? '';
+  /** Matches footer default when env is unset */
+  const defaultAgentPhoneDisplay = '+1 (305)-250-1612';
+  const agentPhoneDisplay = phone.trim() || defaultAgentPhoneDisplay;
+  const agentPhoneTelHref = phone.trim()
+    ? `tel:${phone.replace(/\s/g, '')}`
+    : 'tel:+13052501612';
 
   async function copyEmail() {
     if (!email) return;
@@ -196,6 +202,17 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
                 <p className="select-all break-all text-center text-[15px] font-semibold leading-snug text-slate-100">
                   {email}
                 </p>
+                <div className="mt-3 border-t border-white/10 pt-3">
+                  <p className="mb-1 text-center text-[11px] font-semibold uppercase tracking-wide text-brand-400">
+                    Agent phone
+                  </p>
+                  <a
+                    href={agentPhoneTelHref}
+                    className="block text-center text-[15px] font-semibold text-slate-100 transition-colors hover:text-brand-300"
+                  >
+                    {agentPhoneDisplay}
+                  </a>
+                </div>
               </div>
               <button
                 type="button"
@@ -222,13 +239,13 @@ export default function ContactAgentCta({ property, variant = 'sidebar' }: Conta
             </p>
           )}
 
-          {phone ? (
+          {!email ? (
             <a
-              href={`tel:${phone.replace(/\s/g, '')}`}
+              href={agentPhoneTelHref}
               className="flex w-full items-center justify-center gap-2 py-2 text-sm font-medium text-slate-400 hover:text-brand-400"
             >
               <PhoneIcon className="h-4 w-4 shrink-0" aria-hidden />
-              {phone}
+              {agentPhoneDisplay}
             </a>
           ) : null}
         </div>

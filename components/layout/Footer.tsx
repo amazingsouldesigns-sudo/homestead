@@ -79,7 +79,9 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2.5 text-sm">
                 <PhoneIcon className="h-4 w-4 text-brand-400" />
-                (555) 123-4567
+                <a href="tel:+13052501612" className="transition-colors hover:text-white">
+                  +1 (305)-250-1612
+                </a>
               </li>
               <li className="flex items-center gap-2.5 text-sm">
                 <MapPinIcon className="h-4 w-4 text-brand-400" />
