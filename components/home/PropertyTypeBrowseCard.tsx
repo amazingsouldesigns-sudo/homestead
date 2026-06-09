@@ -19,10 +19,10 @@ const FALLBACK_ICONS: Record<
   BrowseCardFallback,
   { Icon: ComponentType<{ className?: string }>; className: string }
 > = {
-  house: { Icon: HomeIcon, className: 'h-14 w-14 text-brand-400/90' },
-  apartment: { Icon: BuildingOffice2Icon, className: 'h-14 w-14 text-emerald-400/90' },
-  condo: { Icon: BuildingOfficeIcon, className: 'h-14 w-14 text-brand-300/90' },
-  townhouse: { Icon: Square3Stack3DIcon, className: 'h-14 w-14 text-lime-400/90' },
+  house: { Icon: HomeIcon, className: 'h-14 w-14 text-slate-500' },
+  apartment: { Icon: BuildingOffice2Icon, className: 'h-14 w-14 text-slate-500' },
+  condo: { Icon: BuildingOfficeIcon, className: 'h-14 w-14 text-slate-500' },
+  townhouse: { Icon: Square3Stack3DIcon, className: 'h-14 w-14 text-slate-500' },
 };
 
 export default function PropertyTypeBrowseCard({
@@ -48,7 +48,7 @@ export default function PropertyTypeBrowseCard({
       href={href}
       className={cn(
         hasDual && styles.cardFlip,
-        'group relative block overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/80 shadow-lg shadow-black/30 ring-1 ring-white/5 transition-[transform,box-shadow,border-color] duration-300 hover:scale-[1.02] hover:border-brand-400/40 hover:shadow-glow-tight focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500'
+        'group relative block overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/80 shadow-lg shadow-black/30 transition-[transform,box-shadow,border-color] duration-200 hover:scale-[1.01] hover:border-white/20 hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20'
       )}
     >
       <div className={styles.aspect}>

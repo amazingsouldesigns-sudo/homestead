@@ -9,9 +9,11 @@ interface SearchFiltersProps {
   filters: PropertyFilters;
   onChange: (filters: PropertyFilters) => void;
   compact?: boolean;
+  /** Hide sale/rent status when page is rentals-only */
+  hideStatusFilter?: boolean;
 }
 
-export default function SearchFilters({ filters, onChange, compact }: SearchFiltersProps) {
+export default function SearchFilters({ filters, onChange, compact, hideStatusFilter }: SearchFiltersProps) {
   const [showMore, setShowMore] = useState(false);
   const [searchInput, setSearchInput] = useState(filters.search || '');
 
@@ -37,7 +39,7 @@ export default function SearchFilters({ filters, onChange, compact }: SearchFilt
   return (
     <div
       className={cn(
-        'rounded-2xl border border-white/10 bg-zinc-900/90 shadow-glass-elevate shadow-glow-tight ring-1 ring-brand-500/20 backdrop-blur-xl',
+        'surface-cut border border-white/10 bg-zinc-900/90 shadow-sharp ring-1 ring-brand-500/20 backdrop-blur-xl',
         compact ? 'p-3' : 'p-4 md:p-5'
       )}
     >
@@ -66,7 +68,7 @@ export default function SearchFilters({ filters, onChange, compact }: SearchFilt
         >
           <FunnelIcon className="h-4 w-4" />
           {activeFiltersCount > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center border border-white/10 bg-brand-600 text-[10px] font-bold text-white shadow-sharp-sm">
               {activeFiltersCount}
             </span>
           )}
@@ -77,19 +79,20 @@ export default function SearchFilters({ filters, onChange, compact }: SearchFilt
       {showMore && (
         <div className="mt-4 pt-4 border-t border-slate-100 animate-fade-in">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {/* Status */}
-            <div>
-              <label className="text-xs font-medium text-slate-500 mb-1.5 block">Status</label>
-              <select
-                value={filters.property_status || ''}
-                onChange={(e) => updateFilter('property_status', e.target.value)}
-                className="input-field !py-2 text-sm"
-              >
-                <option value="">Any</option>
-                <option value="for_sale">For Sale</option>
-                <option value="for_rent">For Rent</option>
-              </select>
-            </div>
+            {!hideStatusFilter && (
+              <div>
+                <label className="text-xs font-medium text-slate-500 mb-1.5 block">Status</label>
+                <select
+                  value={filters.property_status || ''}
+                  onChange={(e) => updateFilter('property_status', e.target.value)}
+                  className="input-field !py-2 text-sm"
+                >
+                  <option value="">Any</option>
+                  <option value="for_sale">For Sale</option>
+                  <option value="for_rent">For Rent</option>
+                </select>
+              </div>
+            )}
 
             {/* Property Type */}
             <div>

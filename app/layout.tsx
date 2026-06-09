@@ -60,8 +60,9 @@ export default function RootLayout({
               toastOptions={{
                 className: 'font-body',
                 style: {
-                  borderRadius: '12px',
+                  borderRadius: '0',
                   padding: '12px 16px',
+                  border: '1px solid rgba(255,255,255,0.12)',
                   fontSize: '14px',
                   fontWeight: 500,
                 },

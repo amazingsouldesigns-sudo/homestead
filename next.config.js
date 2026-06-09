@@ -20,6 +20,16 @@ const nextConfig = {
       { protocol: 'https', hostname: 'ssl.cdn-redfin.com', pathname: '/**' },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/properties',
+        has: [{ type: 'query', key: 'property_status', value: 'for_rent' }],
+        destination: '/rentals',
+        permanent: false,
+      },
+    ];
+  },
   async rewrites() {
     return [];
   },

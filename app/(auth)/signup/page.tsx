@@ -10,10 +10,10 @@ import {
   EnvelopeIcon,
   EyeIcon,
   EyeSlashIcon,
-  HomeIcon,
   LockClosedIcon,
   UserIcon,
 } from '@heroicons/react/24/outline';
+import { HomesteadMark } from '@/components/ui/HomesteadMark';
 import toast from 'react-hot-toast';
 
 export default function SignupPage() {
@@ -71,9 +71,7 @@ export default function SignupPage() {
           <div className="absolute bottom-32 right-20 w-64 h-64 bg-brand-400/20 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 text-white max-w-md">
-          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-sm">
-            <HomeIcon className="h-8 w-8" />
-          </div>
+          <HomesteadMark className="mb-8 h-14 w-14" iconClassName="h-8 w-8" withShadow={false} />
           <h2 className="font-display text-4xl mb-4">Join Homestead today</h2>
           <p className="text-brand-100 text-lg leading-relaxed">
             Whether you&apos;re looking to buy your dream home or sell your property, Homestead makes it simple and beautiful.
@@ -81,7 +79,7 @@ export default function SignupPage() {
           <div className="mt-10 space-y-4">
             {['Browse thousands of listings', 'Save your favorite properties', 'List and manage properties', 'Secure payment processing'].map((item) => (
               <div key={item} className="flex items-center gap-3">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-brand-400/30">
+                <div className="surface-cut-sm flex h-6 w-6 items-center justify-center border border-white/20 bg-brand-400/30">
                   <CheckIcon className="h-3.5 w-3.5 text-brand-200" />
                 </div>
                 <span className="text-brand-100">{item}</span>
@@ -95,9 +93,7 @@ export default function SignupPage() {
       <div className="flex flex-1 items-center justify-center bg-zinc-950 p-6 md:p-12">
         <div className="w-full max-w-md">
           <Link href="/" className="mb-10 flex items-center gap-2.5 lg:hidden">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 shadow-lg shadow-brand-600/25">
-              <HomeIcon className="h-6 w-6 text-white" />
-            </div>
+            <HomesteadMark className="h-10 w-10" iconClassName="h-6 w-6" />
             <span className="font-display text-2xl text-slate-100">Homestead</span>
           </Link>
 
@@ -168,7 +164,7 @@ export default function SignupPage() {
                     key={option.value}
                     type="button"
                     onClick={() => setForm({ ...form, role: option.value as 'buyer' | 'seller' })}
-                    className={`rounded-xl border-2 p-4 text-left transition-all ${
+                    className={`surface-cut-sm border-2 p-4 text-left transition-all ${
                       form.role === option.value
                         ? 'border-brand-500 bg-brand-500/10 text-slate-100 ring-1 ring-brand-500/30'
                         : 'border-white/10 text-slate-300 hover:border-white/20'

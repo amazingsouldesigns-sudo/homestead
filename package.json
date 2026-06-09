@@ -10,7 +10,9 @@
     "db:migrate": "supabase db push",
     "db:seed": "node supabase/seed.js",
     "sync:rapidapi": "node scripts/sync-rapidapi-listings.mjs",
-    "sync:rapidapi:photos": "node scripts/sync-rapidapi-listings.mjs"
+    "sync:rapidapi:photos": "node scripts/sync-rapidapi-listings.mjs",
+    "import:zpids": "node scripts/import-zpids.mjs",
+    "rentals:force-prices": "node scripts/force-rent-prices.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

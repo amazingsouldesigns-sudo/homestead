@@ -1,5 +1,5 @@
 /**
- * Sync for-sale listings from RapidAPI US Real Estate into public.properties.
+ * Sync listings from RapidAPI US Real Estate into public.properties (for-sale or for-rent).
  *
  * Prerequisites:
  *   - Run migration 002_imported_listings.sql
@@ -9,8 +9,8 @@
  * Usage:
  *   node scripts/sync-rapidapi-listings.mjs
  *
- * Search is driven by env (see below). Adjust RAPIDAPI_FOR_SALE_PATH if requests 404
- * (some docs use /api/v3/for-sale, others /v3/for-sale).
+ * Search is driven by env (see below). Use RAPIDAPI_SEARCH_PATH or RAPIDAPI_FOR_SALE_PATH
+ * (e.g. /v3/for-sale or /v3/for-rent). Set RAPIDAPI_SYNC_PROPERTY_STATUS=for_rent for rentals.
  *
  * RAPIDAPI_MAX_PHOTOS_PER_LISTING — cap on images stored per listing (default 2000).
  *
@@ -21,6 +21,11 @@
  * RAPIDAPI_BACKFILL_ONLY=1 — skip for-sale import; walk existing imported rows in Supabase,
  * call property-detail per external_id, merge with current images, replace if count increases.
  * Optional: RAPIDAPI_BACKFILL_CITY / RAPIDAPI_BACKFILL_STATE_CODE (else uses SYNC_* if set).
+ *
+ * ZPID-only import (50 listings, etc.):
+ *   npm run import:zpids
+ *   Set RAPIDAPI_IMPORT_ZPIDS=123,456,... or RAPIDAPI_IMPORT_ZPIDS_FILE=./scripts/zpids.txt
+ *   Uses /v3/property-detail per ZPID. Default status: for_rent (override with RAPIDAPI_IMPORT_PROPERTY_STATUS).
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -74,6 +79,47 @@ function slugifyPart(s) {
 function makeSlug({ line, city, externalId }) {
   const base = slugifyPart(`${line}-${city}-${externalId}`);
   return base ? `${base}-${Date.now().toString(36)}` : `listing-${externalId}`;
+}
+
+function makeStableSlug({ line, city, externalId }) {
+  const base = slugifyPart(`${line}-${city}-${externalId}`);
+  return base || `listing-${externalId}`;
+}
+
+/** Comma/whitespace-separated ZPIDs, or one per line in RAPIDAPI_IMPORT_ZPIDS_FILE */
+function parseImportZpids() {
+  const file = (process.env.RAPIDAPI_IMPORT_ZPIDS_FILE || '').trim();
+  if (file && existsSync(file)) {
+    const raw = readFileSync(file, 'utf8').replace(/^\uFEFF/, '');
+    return raw
+      .split(/\r?\n/)
+      .map((line) => line.replace(/#.*$/, '').trim())
+      .filter(Boolean);
+  }
+  const inline = (process.env.RAPIDAPI_IMPORT_ZPIDS || '').trim();
+  if (!inline) return [];
+  return inline.split(/[\s,]+/).map((s) => s.trim()).filter(Boolean);
+}
+
+function pickPropertyStatusForImport(r) {
+  const forced = (process.env.RAPIDAPI_IMPORT_PROPERTY_STATUS || '').trim().toLowerCase();
+  if (forced === 'for_rent' || forced === 'for_sale') return forced;
+
+  const hints = [
+    r?.home_status,
+    r?.status,
+    r?.listing_status,
+    r?.listingStatus,
+    r?.property_status,
+  ]
+    .filter(Boolean)
+    .map((s) => String(s).toLowerCase());
+
+  for (const s of hints) {
+    if (s.includes('rent') || s.includes('lease')) return 'for_rent';
+    if (s.includes('sale') || s.includes('sold')) return 'for_sale';
+  }
+  return 'for_rent';
 }
 
 function looksLikeListing(obj) {
@@ -420,7 +466,7 @@ function extractPhotosFromDetailPayload(json) {
   return dedupePhotoUrls(best);
 }
 
-async function fetchDetailPhotoUrls(propertyId, key, host) {
+function buildPropertyDetailUrl(propertyId) {
   const base = (process.env.RAPIDAPI_BASE_URL || 'https://us-real-estate.p.rapidapi.com').replace(
     /\/$/,
     ''
@@ -428,7 +474,27 @@ async function fetchDetailPhotoUrls(propertyId, key, host) {
   const path = process.env.RAPIDAPI_PROPERTY_DETAIL_PATH || '/v3/property-detail';
   const u = new URL(path.startsWith('http') ? path : `${base}${path.startsWith('/') ? '' : '/'}${path}`);
   u.searchParams.set('property_id', String(propertyId));
-  const res = await fetch(u.toString(), {
+  return u.toString();
+}
+
+function extractListingFromDetailPayload(json, propertyId) {
+  const home =
+    json?.data?.home ??
+    json?.data?.property ??
+    json?.home ??
+    json?.property ??
+    null;
+  if (home && typeof home === 'object') {
+    if (home.zpid == null && home.property_id == null) {
+      return { ...home, zpid: String(propertyId), property_id: String(propertyId) };
+    }
+    return home;
+  }
+  return { zpid: String(propertyId), property_id: String(propertyId) };
+}
+
+async function fetchPropertyDetail(propertyId, key, host) {
+  const res = await fetch(buildPropertyDetailUrl(propertyId), {
     headers: {
       'X-RapidAPI-Key': key,
       'X-RapidAPI-Host': host,
@@ -439,10 +505,21 @@ async function fetchDetailPhotoUrls(propertyId, key, host) {
   try {
     json = JSON.parse(text);
   } catch {
-    return [];
+    return { ok: false, status: res.status, json: null, listing: null, photos: [] };
   }
-  if (!res.ok) return [];
-  return extractPhotosFromDetailPayload(json);
+  if (!res.ok) {
+    return { ok: false, status: res.status, json, listing: null, photos: [] };
+  }
+  const listing = extractListingFromDetailPayload(json, propertyId);
+  const photos = extractPhotosFromDetailPayload(json);
+  const fromListing = pickPhotos(listing);
+  const merged = dedupePhotoUrls([...photos, ...fromListing]);
+  return { ok: true, status: res.status, json, listing, photos: merged };
+}
+
+async function fetchDetailPhotoUrls(propertyId, key, host) {
+  const detail = await fetchPropertyDetail(propertyId, key, host);
+  return detail.ok ? detail.photos : [];
 }
 
 function mapPropertyType(r) {
@@ -459,7 +536,7 @@ function mapPropertyType(r) {
   return 'house';
 }
 
-function mapListing(raw) {
+function mapListing(raw, { stableSlug = false, propertyStatus } = {}) {
   const external_id = pickExternalId(raw);
   if (!external_id) return null;
 
@@ -470,15 +547,32 @@ function mapListing(raw) {
   const title =
     [addr.line, addr.city].filter(Boolean).join(' · ') || `Listing ${external_id}`;
 
+  const slugFn = stableSlug ? makeStableSlug : makeSlug;
+  const status =
+    propertyStatus !== undefined
+      ? propertyStatus
+      : stableSlug
+        ? pickPropertyStatusForImport(raw)
+        : 'for_sale';
+
+  const RENT_PRICE_MIN = 1500;
+  const RENT_PRICE_MAX = 2500;
+  const normalizedPrice = (() => {
+    const rawPrice = price > 0 ? price : 0;
+    if (status !== 'for_rent') return rawPrice > 0 ? rawPrice : 1;
+    if (rawPrice <= 0) return 1995;
+    return Math.max(RENT_PRICE_MIN, Math.min(RENT_PRICE_MAX, Math.round(rawPrice)));
+  })();
+
   return {
     listing_origin: 'imported',
     external_id,
     external_source: EXTERNAL_SOURCE,
     seller_id: null,
     title: title.slice(0, 200),
-    slug: makeSlug({ line: addr.line, city: addr.city, externalId: external_id }),
+    slug: slugFn({ line: addr.line, city: addr.city, externalId: external_id }),
     description: description.slice(0, 20000),
-    price: price > 0 ? price : 1,
+    price: normalizedPrice,
     address: addr.line.slice(0, 500),
     city: (addr.city || 'Unknown').slice(0, 120),
     state: (addr.state || '').slice(0, 2),
@@ -489,7 +583,7 @@ function mapListing(raw) {
     bathrooms: Math.max(0, Math.min(50, baths)),
     sqft: Math.max(0, sqft),
     property_type: mapPropertyType(raw),
-    property_status: 'for_sale',
+    property_status: status,
     listing_status: 'active',
     is_featured: false,
     year_built: num(raw?.description?.year_built ?? raw?.year_built, null) || null,
@@ -550,6 +644,81 @@ async function upsertListing(supabase, row) {
   if (insErr) throw insErr;
   await replaceImages(supabase, inserted.id, photo_urls);
   return { id: inserted.id, updated: false };
+}
+
+async function importZpidsOnly(supabase, key, host) {
+  const zpids = parseImportZpids();
+  if (!zpids.length) {
+    console.error(
+      'No ZPIDs to import. Set RAPIDAPI_IMPORT_ZPIDS=123,456 or RAPIDAPI_IMPORT_ZPIDS_FILE=./scripts/zpids.txt'
+    );
+    process.exit(1);
+  }
+
+  const unique = [...new Set(zpids)];
+  const delayMs = Math.max(0, Number(process.env.RAPIDAPI_DETAIL_DELAY_MS ?? 120) || 0);
+  const statusNote = process.env.RAPIDAPI_IMPORT_PROPERTY_STATUS || 'for_rent (auto-detect rent/sale if unset)';
+
+  console.log(`ZPID import: ${unique.length} listing(s). property_status: ${statusNote}`);
+
+  let inserted = 0;
+  let updated = 0;
+  let failed = 0;
+  const slugLines = [];
+
+  for (let i = 0; i < unique.length; i++) {
+    const zpid = unique[i];
+    process.stdout.write(`[${i + 1}/${unique.length}] zpid=${zpid} … `);
+    try {
+      const detail = await fetchPropertyDetail(zpid, key, host);
+      if (!detail.ok || !detail.listing) {
+        failed += 1;
+        console.log(`FAILED (HTTP ${detail.status || '?'})`);
+        if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+        continue;
+      }
+
+      const row = mapListing(detail.listing, { stableSlug: true });
+      if (!row) {
+        failed += 1;
+        console.log('FAILED (could not map listing)');
+        if (delayMs > 0) await new Promise((r) => setTimeout(r, delayMs));
+        continue;
+      }
+
+      row.external_id = String(zpid);
+      const cap = maxPhotosPerListing();
+      row.photo_urls = detail.photos.slice(0, cap);
+
+      const r = await upsertListing(supabase, row);
+      const { data: saved } = await supabase
+        .from('properties')
+        .select('slug, title')
+        .eq('id', r.id)
+        .single();
+
+      if (saved?.slug) slugLines.push(saved.slug);
+      if (r.updated) updated += 1;
+      else inserted += 1;
+      console.log(
+        `OK ${r.updated ? 'updated' : 'inserted'} slug=${saved?.slug || row.slug} photos=${row.photo_urls.length}`
+      );
+    } catch (e) {
+      failed += 1;
+      console.log(`FAILED (${e.message || e})`);
+    }
+    if (delayMs > 0 && i < unique.length - 1) {
+      await new Promise((res) => setTimeout(res, delayMs));
+    }
+  }
+
+  console.log(`\nZPID import done. Inserted: ${inserted}, updated: ${updated}, failed: ${failed}.`);
+
+  if (slugLines.length) {
+    console.log('\n--- Copy into .env.local for rental deals preview (rotation order) ---');
+    console.log(`RENTAL_DEALS_PREVIEW_SLUGS=${slugLines.join(',')}`);
+    console.log('---\n');
+  }
 }
 
 async function backfillImportedPhotosOnly(supabase, key, host) {
@@ -629,19 +798,36 @@ async function backfillImportedPhotosOnly(supabase, key, host) {
   }
 }
 
-function buildForSaleUrl() {
+function syncPropertyStatus() {
+  const s = (process.env.RAPIDAPI_SYNC_PROPERTY_STATUS || '').trim().toLowerCase();
+  if (s === 'for_rent' || s === 'for_sale') return s;
+  const path = (
+    process.env.RAPIDAPI_SEARCH_PATH ||
+    process.env.RAPIDAPI_FOR_SALE_PATH ||
+    '/v3/for-sale'
+  ).toLowerCase();
+  if (path.includes('rent')) return 'for_rent';
+  return 'for_sale';
+}
+
+function buildSearchUrl() {
   const base = (process.env.RAPIDAPI_BASE_URL || 'https://us-real-estate.p.rapidapi.com').replace(
     /\/$/,
     ''
   );
-  const path = process.env.RAPIDAPI_FOR_SALE_PATH || '/v3/for-sale';
+  const path =
+    process.env.RAPIDAPI_SEARCH_PATH ||
+    process.env.RAPIDAPI_FOR_SALE_PATH ||
+    '/v3/for-sale';
   const u = new URL(path.startsWith('http') ? path : `${base}${path.startsWith('/') ? '' : '/'}${path}`);
   const city = process.env.RAPIDAPI_SYNC_CITY || '';
   const stateCode = process.env.RAPIDAPI_SYNC_STATE_CODE || '';
   const location = process.env.RAPIDAPI_SYNC_LOCATION || '';
   const limit = process.env.RAPIDAPI_SYNC_LIMIT || '42';
   const offset = process.env.RAPIDAPI_SYNC_OFFSET || '0';
-  const sort = process.env.RAPIDAPI_SYNC_SORT || 'newest';
+  const pathLower = path.toLowerCase();
+  const defaultSort = pathLower.includes('rent') ? 'freshness' : 'newest';
+  const sort = process.env.RAPIDAPI_SYNC_SORT || defaultSort;
 
   if (city) u.searchParams.set('city', city);
   if (stateCode) u.searchParams.set('state_code', stateCode);
@@ -654,7 +840,8 @@ function buildForSaleUrl() {
 }
 
 async function main() {
-  const url = process.env.RAPIDAPI_FOR_SALE_URL || buildForSaleUrl();
+  const url = process.env.RAPIDAPI_SEARCH_URL || process.env.RAPIDAPI_FOR_SALE_URL || buildSearchUrl();
+  const bulkStatus = syncPropertyStatus();
   const key = process.env.RAPIDAPI_KEY;
   const host =
     process.env.RAPIDAPI_HOST || 'us-real-estate.p.rapidapi.com';
@@ -682,7 +869,14 @@ async function main() {
     return;
   }
 
+  const zpids = parseImportZpids();
+  if (zpids.length > 0 || process.env.RAPIDAPI_ZPID_IMPORT_ONLY === '1') {
+    await importZpidsOnly(supabase, key, host);
+    return;
+  }
+
   console.log('Fetching:', url.replace(key, '***'));
+  console.log('Import property_status:', bulkStatus);
 
   const res = await fetch(url, {
     headers: {
@@ -748,7 +942,7 @@ async function main() {
   let detailPhotoBoost = 0;
 
   for (const raw of results) {
-    const row = mapListing(raw);
+    const row = mapListing(raw, { propertyStatus: bulkStatus });
     if (!row) {
       skipped += 1;
       continue;

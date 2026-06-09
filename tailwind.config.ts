@@ -7,6 +7,18 @@ const config: Config = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    borderRadius: {
+      none: '0',
+      sm: '0',
+      DEFAULT: '0',
+      md: '0',
+      lg: '0',
+      xl: '0',
+      '2xl': '0',
+      '3xl': '0',
+      '4xl': '0',
+      full: '0',
+    },
     extend: {
       colors: {
         accent: {
@@ -55,11 +67,19 @@ const config: Config = {
         widecaps: '0.12em',
       },
       boxShadow: {
-        glow: '0 0 48px -12px rgba(58, 135, 107, 0.35), 0 0 80px -24px rgba(34, 197, 94, 0.12)',
-        'glow-brand': '0 0 32px -8px rgba(58, 135, 107, 0.55), 0 0 48px -12px rgba(74, 222, 128, 0.2)',
-        'glow-tight': '0 0 18px -4px rgba(74, 222, 128, 0.45)',
+        glow: '0 8px 32px -8px rgba(0, 0, 0, 0.45)',
+        'glow-brand': '0 4px 20px -4px rgba(58, 135, 107, 0.25)',
+        'glow-tight': '0 4px 16px -4px rgba(0, 0, 0, 0.35)',
         'glass-elevate':
-          '0 8px 32px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0 1px rgba(58, 135, 107, 0.12)',
+          '0 8px 32px -8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+        sharp: '0 0 0 1px rgba(255, 255, 255, 0.06), 0 20px 48px -16px rgba(0, 0, 0, 0.65)',
+        'sharp-sm': '0 0 0 1px rgba(255, 255, 255, 0.05), 0 8px 24px -8px rgba(0, 0, 0, 0.5)',
+        edge: 'inset 0 1px 0 rgba(255, 255, 255, 0.08), inset 0 -1px 0 rgba(0, 0, 0, 0.35)',
+      },
+      clipPath: {
+        'cut-sm': 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px))',
+        cut: 'polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))',
+        'cut-lg': 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px))',
       },
       backgroundImage: {
         'grid-fine':

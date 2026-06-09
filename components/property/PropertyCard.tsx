@@ -63,7 +63,7 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
 
   return (
     <Link href={`/properties/${property.slug}`} className="group block">
-      <article className="card overflow-hidden transition-all duration-300 hover:border-[#C9A227]/45 hover:ring-[#C9A227]/25">
+      <article className="card overflow-hidden">
         <div className="relative aspect-[4/3] overflow-hidden bg-zinc-800">
           {primaryImage ? (
             <Image
@@ -101,7 +101,7 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
             onClick={handleSave}
             disabled={saving}
             className={cn(
-              'absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-sm',
+              'absolute top-3 right-3 flex h-9 w-9 items-center justify-center border border-white/10 bg-zinc-900/90 transition-all shadow-sharp-sm',
               isSaved
                 ? 'bg-red-500 text-white'
                 : 'gold-favorite-hover bg-zinc-900/90 text-slate-200 ring-1 ring-white/10 hover:bg-zinc-800'
@@ -145,7 +145,7 @@ export default function PropertyCard({ property, saved: initialSaved = false, on
             </div>
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-white/10 pt-3">
-            <span className="badge bg-zinc-800 text-[#EEDDA3] ring-1 ring-[#C9A227]/35">
+            <span className="badge bg-zinc-800 text-slate-300">
               {getPropertyTypeLabel(property.property_type)}
             </span>
           </div>

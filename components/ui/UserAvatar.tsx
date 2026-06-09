@@ -23,7 +23,7 @@ export function UserAvatar({
   const s = SIZES[size];
   if (avatarUrl) {
     return (
-      <div className={cn('relative shrink-0 overflow-hidden rounded-full', s.box, className)}>
+      <div className={cn('surface-cut-sm relative shrink-0 overflow-hidden border border-white/10', s.box, className)}>
         <Image
           src={avatarUrl}
           alt=""

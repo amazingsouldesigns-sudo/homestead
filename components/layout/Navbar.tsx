@@ -29,13 +29,8 @@ export default function Navbar() {
         <nav className="flex items-center justify-between h-16 md:h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <HomesteadMark
-              className="w-9 h-9 transition-shadow group-hover:shadow-brand-600/40"
-              iconClassName="w-5 h-5"
-            />
-            <span className="font-display hidden bg-gradient-to-r from-white via-brand-300 to-brand-500 bg-clip-text text-xl text-transparent sm:block">
-              Homestead
-            </span>
+            <HomesteadMark className="h-9 w-9" iconClassName="w-5 h-5" />
+            <span className="font-display hidden text-xl text-slate-100 sm:block">Homestead</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -68,10 +63,10 @@ export default function Navbar() {
                 <div className="relative">
                   <button
                     onClick={() => setProfileOpen(!profileOpen)}
-                    className="flex items-center gap-2 rounded-full border border-white/10 bg-zinc-900/80 py-1.5 pl-2 pr-3 ring-1 ring-brand-500/20 transition-colors hover:border-brand-400/40 hover:shadow-glow-tight"
+                    className="surface-cut-sm flex items-center gap-2 border border-white/10 bg-zinc-900/80 py-1.5 pl-2 pr-3 transition-colors hover:border-white/20"
                   >
                     <div
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-600/30 text-brand-200"
+                      className="flex h-8 w-8 shrink-0 items-center justify-center border border-white/10 bg-zinc-800 text-slate-300"
                       aria-hidden
                     >
                       <UserIcon className="h-4 w-4" />
@@ -85,7 +80,7 @@ export default function Navbar() {
                   {profileOpen && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-                      <div className="absolute right-0 z-50 mt-2 w-56 origin-top-right animate-scale-in rounded-2xl border border-white/10 bg-zinc-900 py-2 shadow-xl shadow-black/60 ring-1 ring-brand-500/25 backdrop-blur-xl">
+                      <div className="surface-cut-sm absolute right-0 z-50 mt-2 w-56 origin-top-right animate-scale-in border border-white/10 bg-zinc-900 py-2 shadow-sharp ring-1 ring-brand-500/25 backdrop-blur-xl">
                         <div className="border-b border-white/10 px-4 py-2.5">
                           <p className="truncate text-sm font-semibold text-slate-100">{user.full_name || 'User'}</p>
                           <p className="truncate text-xs text-slate-400">{user.email}</p>
@@ -150,7 +145,7 @@ export default function Navbar() {
 
           {/* Mobile menu button */}
           <button
-            className="rounded-lg p-2 text-slate-200 hover:bg-white/10 md:hidden"
+            className="surface-cut-sm border border-white/10 p-2 text-slate-200 transition-colors hover:border-white/20 hover:bg-white/10 md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
@@ -163,7 +158,7 @@ export default function Navbar() {
             <div className="flex flex-col gap-1">
               <Link
                 href="/properties"
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
+                className="flex items-center gap-3 border border-transparent px-3 py-2.5 text-sm font-medium uppercase tracking-widecaps text-slate-200 transition-colors hover:border-white/10 hover:bg-white/5"
                 onClick={() => setMobileOpen(false)}
               >
                 <MagnifyingGlassIcon className="h-4 w-4 text-slate-500" />
@@ -173,7 +168,7 @@ export default function Navbar() {
                 <>
                   <Link
                     href="/dashboard"
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
+                    className="flex items-center gap-3 border border-transparent px-3 py-2.5 text-sm font-medium uppercase tracking-widecaps text-slate-200 transition-colors hover:border-white/10 hover:bg-white/5"
                     onClick={() => setMobileOpen(false)}
                   >
                     <Squares2X2Icon className="h-4 w-4 text-slate-500" />
@@ -181,7 +176,7 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/dashboard/saved"
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
+                    className="flex items-center gap-3 border border-transparent px-3 py-2.5 text-sm font-medium uppercase tracking-widecaps text-slate-200 transition-colors hover:border-white/10 hover:bg-white/5"
                     onClick={() => setMobileOpen(false)}
                   >
                     <HeartIcon className="h-4 w-4 text-slate-500" />
@@ -189,7 +184,7 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/dashboard/settings"
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
+                    className="flex items-center gap-3 border border-transparent px-3 py-2.5 text-sm font-medium uppercase tracking-widecaps text-slate-200 transition-colors hover:border-white/10 hover:bg-white/5"
                     onClick={() => setMobileOpen(false)}
                   >
                     <Cog6ToothIcon className="h-4 w-4 text-slate-500" />
@@ -198,7 +193,7 @@ export default function Navbar() {
                   {user.role === 'seller' && (
                     <Link
                       href="/dashboard/listings?new=true"
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
+                      className="flex items-center gap-3 border border-transparent px-3 py-2.5 text-sm font-medium uppercase tracking-widecaps text-slate-200 transition-colors hover:border-white/10 hover:bg-white/5"
                       onClick={() => setMobileOpen(false)}
                     >
                       <PlusIcon className="h-4 w-4 text-slate-500" />
@@ -208,7 +203,7 @@ export default function Navbar() {
                   {user.role === 'admin' && (
                     <Link
                       href="/admin"
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-200 hover:bg-white/5"
+                      className="flex items-center gap-3 border border-transparent px-3 py-2.5 text-sm font-medium uppercase tracking-widecaps text-slate-200 transition-colors hover:border-white/10 hover:bg-white/5"
                       onClick={() => setMobileOpen(false)}
                     >
                       <ShieldCheckIcon className="h-4 w-4 text-slate-500" />
@@ -217,7 +212,7 @@ export default function Navbar() {
                   )}
                   <button
                     onClick={() => { signOut(); setMobileOpen(false); }}
-                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-400 hover:bg-red-950/40"
+                    className="flex items-center gap-3 border border-transparent px-3 py-2.5 text-sm font-medium uppercase tracking-widecaps text-red-400 transition-colors hover:border-red-500/20 hover:bg-red-950/40"
                   >
                     <ArrowRightOnRectangleIcon className="h-4 w-4" />
                     Sign Out

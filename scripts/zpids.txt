@@ -1,0 +1,5 @@
+# One Zillow ZPID per line (from the Zillow URL, e.g. .../12345678_zpid/)
+# Lines starting with # are ignored.
+# Example:
+# 2055406736
+# 4567890123

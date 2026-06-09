@@ -52,9 +52,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Sidebar */}
           <aside className="lg:w-64 flex-shrink-0">
             <div className="lg:sticky lg:top-24">
-              <div className="rounded-2xl border border-white/10 bg-zinc-900/80 p-4 shadow-lg shadow-black/30 backdrop-blur-xl backdrop-saturate-150">
+              <div className="surface-cut border border-white/10 bg-zinc-900/80 p-4 shadow-sharp backdrop-blur-xl backdrop-saturate-150">
                 {/* User info */}
-                <div className="mb-6 flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-950/80 p-3">
+                <div className="surface-cut-sm mb-6 flex items-center gap-3 border border-white/10 bg-zinc-950/80 p-3">
                   <UserAvatar avatarUrl={user.avatar_url} size="lg" />
                   <div className="min-w-0">
                     <p className="truncate text-sm font-semibold text-slate-100">{user.full_name || 'User'}</p>
@@ -71,10 +71,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                         key={item.href}
                         href={item.href}
                         className={cn(
-                          'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors',
+                          'flex items-center gap-3 border border-transparent px-3 py-2.5 text-sm font-medium uppercase tracking-widecaps transition-colors',
                           pathname === item.href
-                            ? 'bg-brand-500/15 text-brand-300 ring-1 ring-brand-500/30'
-                            : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'
+                            ? 'border-brand-500/30 bg-brand-500/15 text-brand-300 shadow-sharp-sm'
+                            : 'text-slate-400 hover:border-white/10 hover:bg-white/5 hover:text-slate-200'
                         )}
                       >
                         <item.icon className="h-4 w-4" />

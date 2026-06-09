@@ -9,9 +9,9 @@ import {
   EnvelopeIcon,
   EyeIcon,
   EyeSlashIcon,
-  HomeIcon,
   LockClosedIcon,
 } from '@heroicons/react/24/outline';
+import { HomesteadMark } from '@/components/ui/HomesteadMark';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -47,9 +47,7 @@ export default function LoginPage() {
           <div className="absolute bottom-20 left-20 w-48 h-48 bg-brand-400/20 rounded-full blur-3xl" />
         </div>
         <div className="relative z-10 text-white max-w-md">
-          <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-8 backdrop-blur-sm">
-            <HomeIcon className="h-8 w-8" />
-          </div>
+          <HomesteadMark className="mb-8 h-14 w-14" iconClassName="h-8 w-8" withShadow={false} />
           <h2 className="font-display text-4xl mb-4">Welcome back to Homestead</h2>
           <p className="text-brand-100 text-lg leading-relaxed">
             Your journey to finding the perfect property continues. Sign in to access your saved listings, manage properties, and more.
@@ -61,9 +59,7 @@ export default function LoginPage() {
       <div className="flex flex-1 items-center justify-center bg-zinc-950 p-6 md:p-12">
         <div className="w-full max-w-md">
           <Link href="/" className="mb-10 flex items-center gap-2.5 lg:hidden">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 shadow-lg shadow-brand-600/25">
-              <HomeIcon className="h-6 w-6 text-white" />
-            </div>
+            <HomesteadMark className="h-10 w-10" iconClassName="h-6 w-6" />
             <span className="font-display text-2xl text-slate-100">Homestead</span>
           </Link>
 

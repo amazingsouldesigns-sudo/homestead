@@ -15,7 +15,7 @@ export function HomesteadMark({
   return (
     <div
       className={cn(
-        'bg-brand-600 rounded-xl flex items-center justify-center shrink-0',
+        'surface-cut-sm bg-brand-600 flex items-center justify-center shrink-0 shadow-sharp-sm',
         withShadow && 'shadow-lg shadow-brand-600/25',
         className
       )}

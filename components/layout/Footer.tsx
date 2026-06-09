@@ -17,7 +17,7 @@ export default function Footer() {
   );
 
   return (
-    <footer className="mt-auto border-t border-brand-500/20 bg-zinc-950/95 text-slate-400 shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.4)] backdrop-blur-xl backdrop-saturate-150">
+    <footer className="relative mt-auto border-t border-brand-500/25 bg-zinc-950/95 text-slate-400 shadow-[0_-12px_40px_-12px_rgba(0,0,0,0.4)] backdrop-blur-xl backdrop-saturate-150 before:pointer-events-none before:absolute before:left-0 before:top-0 before:h-px before:w-32 before:bg-gradient-to-r before:from-[#C9A227]/80 before:to-transparent">
       <div className="page-container py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
@@ -33,12 +33,13 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4 uppercase tracking-wider">Explore</h4>
+            <h4 className="label-future mb-4 text-slate-300">Explore</h4>
             <ul className="space-y-3">
               {[
                 { label: 'Browse Properties', href: '/properties' },
-                { label: 'Houses for Sale', href: '/properties?type=house&status=for_sale' },
-                { label: 'Apartments for Rent', href: '/properties?type=apartment&status=for_rent' },
+                { label: 'Houses for Sale', href: '/properties?property_type=house&property_status=for_sale' },
+                { label: 'Apartments for Rent', href: '/rentals?property_type=apartment' },
+                { label: 'All Rentals', href: '/rentals' },
                 { label: 'Featured Listings', href: '/properties?featured=true' },
               ].map((link) => (
                 <li key={link.href}>
@@ -52,7 +53,7 @@ export default function Footer() {
 
           {/* For Sellers */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4 uppercase tracking-wider">For Sellers</h4>
+            <h4 className="label-future mb-4 text-slate-300">For Sellers</h4>
             <ul className="space-y-3">
               {[
                 { label: 'List Your Property', href: '/signup' },
@@ -71,7 +72,7 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="text-white font-semibold text-sm mb-4 uppercase tracking-wider">Contact</h4>
+            <h4 className="label-future mb-4 text-slate-300">Contact</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-2.5 text-sm">
                 <EnvelopeIcon className="h-4 w-4 text-brand-400" />

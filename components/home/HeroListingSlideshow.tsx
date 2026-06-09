@@ -27,6 +27,7 @@ export default function HeroListingSlideshow({ images }: { images: string[] }) {
           src={src}
           alt=""
           fill
+          unoptimized
           className={`object-cover transition-opacity duration-[1200ms] ease-in-out ${
             i === active ? 'opacity-100 z-[1]' : 'opacity-0 z-0'
           }`}
